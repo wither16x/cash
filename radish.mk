@@ -1,4 +1,3 @@
-include prefix.mk
 include ../../prefixes.mk
 
 BUILD := Build

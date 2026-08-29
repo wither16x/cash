@@ -1,5 +1,3 @@
-include prefix.mk
-
 BUILD := Build
 BIN := Bin
 SRC := Cash
