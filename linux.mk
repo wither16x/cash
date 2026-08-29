@@ -5,7 +5,7 @@ BIN := Bin
 SRC := Cash
 INC := Include
 
-CXX := $(PREFIX)clang++
+CXX := clang++
 CXXFLAGS := -fno-lto \
 		-fno-pic \
 		-fno-pie \
@@ -15,6 +15,10 @@ CXXFLAGS := -fno-lto \
 		-I$(INCLUDE) \
 		-MMD \
 		-MP
+LD := clang++
+LDFLAGS :=
+	-fuse-ld=lld \
+	-L$(LIBC_PREFIX)
 
 SRCS := $(shell find $(SRC) -name '*.cpp')
 OBJS := $(patsubst $(SRC)/%.cpp,$(BUILD)/%.o,$(SRCS))
