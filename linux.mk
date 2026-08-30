@@ -10,13 +10,11 @@ CXXFLAGS := -fno-lto \
 		-std=c++23 \
 		-Wall \
 		-Wextra \
-		-I$(INCLUDE) \
+		-I$(INC) \
 		-MMD \
 		-MP
 LD := clang++
-LDFLAGS :=
-	-fuse-ld=lld \
-	-L$(LIBC_PREFIX)
+LDFLAGS := -fuse-ld=lld
 
 SRCS := $(shell find $(SRC) -name '*.cpp')
 OBJS := $(patsubst $(SRC)/%.cpp,$(BUILD)/%.o,$(SRCS))
