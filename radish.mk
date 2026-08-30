@@ -1,11 +1,9 @@
-include ../../prefixes.mk
-
 BUILD := Build
 BIN := Bin
 SRC := Cash
 INC := Include
 
-CXX := $(PREFIX)clang++
+CXX := x86_64-radishos-clang++
 CXXFLAGS := -fno-lto \
 		-fno-pic \
 		-fno-pie \
@@ -15,7 +13,7 @@ CXXFLAGS := -fno-lto \
 		-I$(INCLUDE) \
 		-MMD \
 		-MP
-LD := $(PREFIX)clang++
+LD := x86_64-radishos-clang++
 # when downloading CASH from RadishOS download scripts:
 # .
 # ./dependencies/cash/
