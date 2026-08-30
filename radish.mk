@@ -1,3 +1,7 @@
+# to improve later
+# (we are actually using my relative workspace tree)
+include ../radish_os/prefixes.mk
+
 BUILD := Build
 BIN := Bin
 SRC := Cash
@@ -10,18 +14,17 @@ CXXFLAGS := -fno-lto \
 		-std=c++23 \
 		-Wall \
 		-Wextra \
-		-I$(INCLUDE) \
+		-I$(INC) \
 		-MMD \
-		-MP
+		-MP \
+		-g
 LD := x86_64-radishos-clang++
-# when downloading CASH from RadishOS download scripts:
-# .
-# ./dependencies/cash/
-# ./userspace/linker.lds 
+# to improve later
+# (we are actually using my relative workspace tree)
 LDFLAGS := -static -nostdlib -z max-page-size=0x1000 \
 	-fuse-ld=lld \
 	-L$(LIBC_PREFIX) \
-	-T ../../userspace/linker.lds
+	-T ../radish_os/userspace/linker.lds
 	
 SRCS := $(shell find $(SRC) -name '*.cpp')
 OBJS := $(patsubst $(SRC)/%.cpp,$(BUILD)/%.o,$(SRCS))
