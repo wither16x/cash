@@ -17,11 +17,18 @@ namespace Cash
                 Typing::USize cursor;
                 bool found_integer;
                 String::String curr_integer;
+                String::String data;
 
         public:
-                void lex(this Lexer &self, const String::String &data);
+                Lexer(const String::String &data = "");
+
+                void lex(this Lexer &self);
                 void reset(this Lexer &self);
-                void advance(this Lexer &self, char curr_ch);
+                void advance(this Lexer &self);
+                void setData(this Lexer &self, const String::String &new_data);
+
+                bool foundBlank(this const Lexer &self);
+                bool foundDigit(this const Lexer &self);
 
                 const Vector::Vector<Token> &getTokens(this const Lexer &self);
         };

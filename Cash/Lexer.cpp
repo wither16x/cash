@@ -8,23 +8,27 @@ using namespace Melon;
 
 namespace Cash
 {
-        void Lexer::lex(this Lexer &self, const String::String &data)
+        Lexer::Lexer(const String::String &data)
+                : data(data)
+        {}
+
+        void Lexer::lex(this Lexer &self)
         {
                 self.reset();
 
-                for (; self.cursor < data.length(); self.cursor++) {
+                for (; self.cursor < self.data.length(); self.cursor++) {
                         self.curr_integer = "";
 
-                        self.advance(data[self.cursor]);
+                        self.advance();
 
                         // skip whitespaces, tabs and newlines
-                        while (Typing::isSpace(data[self.cursor]))
-                                self.advance(data[self.cursor]);
+                        while (self.foundBlank())
+                                self.advance();
 
                         // handle integers
-                        while (Typing::isDigit(data[self.cursor])) {
+                        while (self.foundDigit()) {
                                 self.found_integer = true;
-                                self.curr_integer.appendChar(data[self.cursor]);
+                                self.curr_integer.appendChar(self.data[self.cursor]);
                                 ++self.cursor;
                                 ++self.position.column;
                         }
@@ -34,7 +38,7 @@ namespace Cash
                                 self.found_integer = false;
                         }
 
-                        switch (data[self.cursor]) {
+                        switch (self.data[self.cursor]) {
                         case '+':
                                 self.tokens.emplaceBack(self.position, TokenType::Plus);
                                 break;
@@ -73,15 +77,30 @@ namespace Cash
                 self.position = {0, 0};
         }
 
-        void Lexer::advance(this Lexer &self, char curr_ch)
+        void Lexer::advance(this Lexer &self)
         {
                 ++self.position.column;
 
-                if (curr_ch == '\n') {
+                if (self.data[self.cursor] == '\n') {
                         self.position.column = 0;
                         ++self.position.row;
                         ++self.cursor;
                 }
+        }
+
+        void Lexer::setData(this Lexer &self, const String::String &new_data)
+        {
+                self.data = new_data;
+        }
+
+        bool Lexer::foundBlank(this const Lexer &self)
+        {
+                return Typing::isSpace(self.data[self.cursor]);
+        }
+
+        bool Lexer::foundDigit(this const Lexer &self)
+        {
+                return Typing::isDigit(self.data[self.cursor]);
         }
 
         const Vector::Vector<Token> &Lexer::getTokens(this const Lexer &self)

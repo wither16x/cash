@@ -17,7 +17,8 @@ namespace Cash
 
                 while (running) {
                         String::String command = Input::input("cash> ");
-                        lexer.lex(command);
+                        lexer.setData(command);
+                        lexer.lex();
 
                         for (auto &tok : lexer.getTokens())
                                 Print::println("Token {} found at {};{}", tokenTypeToString(tok.type), tok.position.column, tok.position.row);
