@@ -3,61 +3,38 @@
 #include <Melon/String.hpp>
 #include <Melon/Typing.hpp>
 #include <Melon/FileSystem.hpp>
-#include <utility>
 
 using namespace Melon;
 
 namespace Cash
 {
-        namespace
-        {
-                const char *token_type_strings[] = {
-                        "Integer",
-                        "Plus",
-                        "Minus",
-                        "Star",
-                        "Slash",
-                        "LeftParenthesis",
-                        "RightParenthesis",
-                        "EndOfFile"
-                };
-        } // anonymous namespace
-
         void Lexer::lex(this Lexer &self, const String::String &data)
         {
-                self.tokens.clear();
-                self.position = {0, 0};
+                self.reset();
 
-                for (Typing::USize i = 0; i < data.length(); i++) {
-                        bool found_integer = false;
-                        String::String integer_buf;
+                for (; self.cursor < data.length(); self.cursor++) {
+                        self.curr_integer = "";
 
-                        ++self.position.column;
-
-                        if (data[i] == '\n') {
-                                self.position.column = 0;
-                                ++self.position.row;
-                                ++i;
-                        }
+                        self.advance(data[self.cursor]);
 
                         // skip whitespaces, tabs and newlines
-                        while (Typing::isSpace(data[i]))
-                                ++i;
+                        while (Typing::isSpace(data[self.cursor]))
+                                self.advance(data[self.cursor]);
 
                         // handle integers
-                        while (Typing::isDigit(data[i])) {
-                                found_integer = true;
-                                integer_buf.appendChar(data[i]);
-                                ++i;
+                        while (Typing::isDigit(data[self.cursor])) {
+                                self.found_integer = true;
+                                self.curr_integer.appendChar(data[self.cursor]);
+                                ++self.cursor;
                                 ++self.position.column;
                         }
 
-                        if (found_integer) {
+                        if (self.found_integer) {
                                 self.tokens.emplaceBack(self.position, TokenType::Integer);
-                                found_integer = false;
+                                self.found_integer = false;
                         }
 
-                        switch (data[i]) {
+                        switch (data[self.cursor]) {
                         case '+':
                                 self.tokens.emplaceBack(self.position, TokenType::Plus);
                                 break;
@@ -89,13 +66,26 @@ namespace Cash
                 }
         }
 
+        void Lexer::reset(this Lexer &self)
+        {
+                self.tokens.clear();
+                self.cursor = 0;
+                self.position = {0, 0};
+        }
+
+        void Lexer::advance(this Lexer &self, char curr_ch)
+        {
+                ++self.position.column;
+
+                if (curr_ch == '\n') {
+                        self.position.column = 0;
+                        ++self.position.row;
+                        ++self.cursor;
+                }
+        }
+
         const Vector::Vector<Token> &Lexer::getTokens(this const Lexer &self)
         {
                 return self.tokens;
-        }
-
-        String::String tokenTypeToString(TokenType toktype)
-        {
-                return token_type_strings[std::to_underlying(toktype)];
         }
 } // namespace Cash
