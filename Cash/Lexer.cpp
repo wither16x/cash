@@ -1,4 +1,5 @@
 #include <Cash/Lexer.hpp>
+#include <Cash/Error.hpp>
 
 #include <Melon/String.hpp>
 #include <Melon/Typing.hpp>
@@ -34,37 +35,44 @@ namespace Cash
                         }
 
                         if (self.found_integer) {
-                                self.tokens.emplaceBack(self.position, TokenType::Integer);
+                                self.tokens.emplaceBack(self.position, TokenType::Integer, self.curr_integer);
                                 self.found_integer = false;
                         }
 
                         switch (self.data[self.cursor]) {
                         case '+':
-                                self.tokens.emplaceBack(self.position, TokenType::Plus);
+                                self.tokens.emplaceBack(self.position, TokenType::Plus, "+");
                                 break;
 
                         case '-':
-                                self.tokens.emplaceBack(self.position, TokenType::Minus);
+                                self.tokens.emplaceBack(self.position, TokenType::Minus, "-");
                                 break;
 
                         case '*':
-                                self.tokens.emplaceBack(self.position, TokenType::Star);
+                                self.tokens.emplaceBack(self.position, TokenType::Star, "*");
                                 break;
 
                         case '/':
-                                self.tokens.emplaceBack(self.position, TokenType::Slash);
+                                self.tokens.emplaceBack(self.position, TokenType::Slash, "/");
                                 break;
 
                         case '(':
-                                self.tokens.emplaceBack(self.position, TokenType::LeftParenthesis);
+                                self.tokens.emplaceBack(self.position, TokenType::LeftParenthesis, "(");
                                 break;
 
                         case ')':
-                                self.tokens.emplaceBack(self.position, TokenType::RightParenthesis);
+                                self.tokens.emplaceBack(self.position, TokenType::RightParenthesis, ")");
                                 break;
 
                         case FileSystem::EndOfFile:
-                                self.tokens.emplaceBack(self.position, TokenType::EndOfFile);
+                                self.tokens.emplaceBack(self.position, TokenType::EndOfFile, "EOF");
+                                break;
+
+                        case '\0':
+                                break;
+
+                        default:
+                                illegalCharacterError(self.data[self.cursor], self.position);
                                 break;
                         }
                 }

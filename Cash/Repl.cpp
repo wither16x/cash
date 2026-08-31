@@ -21,7 +21,7 @@ namespace Cash
                         lexer.lex();
 
                         for (auto &tok : lexer.getTokens())
-                                Print::println("Token {} found at {};{}", tokenTypeToString(tok.type), tok.position.column, tok.position.row);
+                                Print::println("Token {} found at {};{} with value '{}'", tokenTypeToString(tok.type), tok.position.column, tok.position.row, tok.value);
                 }
         }
 } // namespace Cash

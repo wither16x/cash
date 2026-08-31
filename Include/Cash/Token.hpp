@@ -27,6 +27,7 @@ namespace Cash
         {
                 Position position;
                 TokenType type;
+                String::String value = "";
         };
 
         String::String tokenTypeToString(TokenType toktype);
