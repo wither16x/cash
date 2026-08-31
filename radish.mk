@@ -16,8 +16,7 @@ CXXFLAGS := -fno-lto \
 		-Wextra \
 		-I$(INC) \
 		-MMD \
-		-MP \
-		-g
+		-MP
 LD := x86_64-radishos-clang++
 # to improve later
 # (we are actually using my relative workspace tree)
