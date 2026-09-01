@@ -32,11 +32,9 @@ namespace Cash
         EvalValue Interpreter::evaluate(this Interpreter &self, Node *const &node)
         {
                 if (isNodeType<Node>(node)) {
-                        std::monostate null;
-                        return {null};
+                        return null_value;
                 } else if (isNodeType<NodeExpr>(node)) {
-                        std::monostate null;
-                        return {null};
+                        return null_value;
                 } else if (isNodeType<NodeUnaryOp>(node)) {
                         NodeUnaryOp *unop_node = static_cast<NodeUnaryOp *>(node);
                         EvalValue val = self.evaluate(unop_node->value);
@@ -83,8 +81,7 @@ namespace Cash
                         return value;
                 }
 
-                std::monostate null;
-                return {null};
+                return null_value;
         }
 
         void Interpreter::reset(this Interpreter &self)
