@@ -4,8 +4,6 @@
 
 #include <Melon/Conversion.hpp>
 
-#include <typeinfo>
-
 using namespace Melon;
 
 namespace Cash
@@ -33,15 +31,13 @@ namespace Cash
 
         EvalValue Interpreter::evaluate(this Interpreter &self, Node *const &node)
         {
-                const std::type_info &node_type = typeid(*node);
-
-                if (node_type == typeid(Node)) {
+                if (isNodeType<Node>(node)) {
                         std::monostate null;
                         return {null};
-                } else if (node_type == typeid(NodeExpr)) {
+                } else if (isNodeType<NodeExpr>(node)) {
                         std::monostate null;
                         return {null};
-                } else if (node_type == typeid(NodeUnaryOp)) {
+                } else if (isNodeType<NodeUnaryOp>(node)) {
                         NodeUnaryOp *unop_node = static_cast<NodeUnaryOp *>(node);
                         EvalValue val = self.evaluate(unop_node->value);
 
@@ -57,7 +53,7 @@ namespace Cash
                                 result
                         };
                         return value;
-                } else if (node_type == typeid(NodeBinaryOp)) {
+                } else if (isNodeType<NodeBinaryOp>(node)) {
                         NodeBinaryOp *binop_node = static_cast<NodeBinaryOp *>(node);
                         EvalValue left = self.evaluate(binop_node->left);
                         EvalValue right = self.evaluate(binop_node->right);
@@ -79,7 +75,7 @@ namespace Cash
                                 result
                         };
                         return value;
-                } else if (node_type == typeid(NodeInteger)) {
+                } else if (isNodeType<NodeInteger>(node)) {
                         NodeInteger *int_node = static_cast<NodeInteger *>(node);
                         EvalValue value = {
                                 Melon::Conversion::stringToInt<int>(int_node->value)

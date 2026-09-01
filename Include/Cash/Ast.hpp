@@ -4,24 +4,14 @@
 
 #include <Melon/String.hpp>
 #include <Melon/Fmt.hpp>
+#include <typeinfo>
 
 namespace Cash
 {
         using ast_t = Melon::Vector::Vector<struct Node *>;
 
-        enum class NodeType
-        {
-                Node,
-                Expr,
-                UnaryOp,
-                BinaryOp,
-                Integer
-        };
-
         struct Node
         {
-                NodeType type = NodeType::Node;
-
                 virtual ~Node()
                 {}
 
@@ -33,8 +23,6 @@ namespace Cash
 
         struct NodeExpr : Node
         {
-                NodeType type = NodeType::Expr;
-
                 inline Melon::String::String info() const override
                 {
                         return "NodeExpr()";
@@ -43,8 +31,6 @@ namespace Cash
 
         struct NodeUnaryOp : NodeExpr
         {
-                NodeType type = NodeType::UnaryOp;
-
                 NodeExpr *value;
                 TokenType op;
 
@@ -58,8 +44,6 @@ namespace Cash
 
         struct NodeBinaryOp : NodeExpr
         {
-                NodeType type = NodeType::BinaryOp;
-
                 NodeExpr *left;
                 NodeExpr *right;
                 TokenType op;
@@ -74,8 +58,6 @@ namespace Cash
 
         struct NodeInteger : NodeExpr
         {
-                NodeType type = NodeType::Integer;
-
                 Melon::String::String value;
 
                 inline Melon::String::String info() const override
@@ -85,4 +67,11 @@ namespace Cash
                         );
                 }
         };
+
+        template<typename T>
+        inline constexpr bool isNodeType(Node *const &node)
+        {
+                const std::type_info &node_type = typeid(*node);
+                return node_type == typeid(T);
+        }
 } // namespace Cash
