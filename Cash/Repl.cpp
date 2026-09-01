@@ -1,5 +1,6 @@
 #include <Cash/Repl.hpp>
 #include <Cash/Lexer.hpp>
+#include <Cash/Parser.hpp>
 
 #include <Melon/String.hpp>
 #include <Melon/Input.hpp>
@@ -12,6 +13,7 @@ namespace Cash
         void repl()
         {
                 Lexer lexer;
+                Parser parser;
 
                 bool running = true;
 
@@ -19,9 +21,13 @@ namespace Cash
                         String::String command = Input::input("cash> ");
                         lexer.setData(command);
                         lexer.lex();
+                        
+                        auto tokens = lexer.getTokens();
+                        parser.setTokens(tokens);
+                        parser.parse();
 
-                        for (auto &tok : lexer.getTokens())
-                                Print::println("Token {} found at {};{} with value '{}'", tokenTypeToString(tok.type), tok.position.column, tok.position.row, tok.value);
+                        for (auto &nd : parser.getNodes())
+                                Print::println("Node {}", nd->info());
                 }
         }
 } // namespace Cash
