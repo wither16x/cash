@@ -7,7 +7,7 @@ using namespace Melon;
 
 namespace Cash
 {
-        Parser::Parser(const Vector::Vector<Token> &tokens)
+        Parser::Parser(const tokens_t &tokens)
                 : tokens(tokens)
         {}
 
@@ -157,12 +157,12 @@ namespace Cash
                 self.nodes.clear();
         }
 
-        void Parser::setTokens(this Parser &self, const Vector::Vector<Token> &new_tokens)
+        void Parser::setTokens(this Parser &self, const tokens_t &new_tokens)
         {
                 self.tokens = new_tokens;
         }
 
-        const Vector::Vector<Node *> &Parser::getNodes(this const Parser &self)
+        const ast_t &Parser::getNodes(this const Parser &self)
         {
                 return self.nodes;
         }

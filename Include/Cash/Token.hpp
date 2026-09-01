@@ -6,6 +6,8 @@
 
 namespace Cash
 {
+        using tokens_t = Melon::Vector::Vector<struct Token>;
+
         enum class TokenType
         {
                 Integer,

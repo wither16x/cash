@@ -10,7 +10,7 @@ namespace Cash
 {
         class Lexer
         {
-                Melon::Vector::Vector<Token> tokens;
+                tokens_t tokens;
                 Position position;
                 Melon::Typing::USize cursor;
                 Melon::String::String curr_integer;
@@ -27,6 +27,6 @@ namespace Cash
                 bool foundBlank(this const Lexer &self);
                 bool foundDigit(this const Lexer &self);
 
-                const Melon::Vector::Vector<Token> &getTokens(this const Lexer &self);
+                const tokens_t &getTokens(this const Lexer &self);
         };
 } // namespace Cash

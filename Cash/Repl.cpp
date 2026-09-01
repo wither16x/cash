@@ -1,6 +1,7 @@
 #include <Cash/Repl.hpp>
 #include <Cash/Lexer.hpp>
 #include <Cash/Parser.hpp>
+#include <Cash/Interpreter.hpp>
 
 #include <Melon/String.hpp>
 #include <Melon/Input.hpp>
@@ -14,6 +15,7 @@ namespace Cash
         {
                 Lexer lexer;
                 Parser parser;
+                Interpreter interpreter;
 
                 bool running = true;
 
@@ -22,12 +24,16 @@ namespace Cash
                         lexer.setData(command);
                         lexer.lex();
                         
-                        auto tokens = lexer.getTokens();
+                        tokens_t tokens = lexer.getTokens();
                         parser.setTokens(tokens);
                         parser.parse();
 
-                        for (auto &nd : parser.getNodes())
-                                Print::println("Node {}", nd->info());
+                        ast_t nodes = parser.getNodes();
+                        interpreter.setNodes(nodes);
+                        interpreter.interpret();
+
+                        for (auto &val : interpreter.getEvalValues())
+                                Print::println("{}", val.toString());
                 }
         }
 } // namespace Cash
