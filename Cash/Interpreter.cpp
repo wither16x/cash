@@ -12,8 +12,17 @@ namespace Cash
         {
                 return std::visit(overloaded{
                         [](std::monostate) {return String::String("null");},
-                        [](Melon::String::String s) {return s;},
-                        [](int i) {return Melon::Conversion::intToString(i, Melon::Conversion::Base::Decimal);}
+                        [](String::String s) {return s;},
+                        [](int i) {return Conversion::intToString(i, Conversion::Base::Decimal);}
+                }, self.value);
+        }
+
+        int EvalValue::toInt(this const EvalValue &self)
+        {
+                return std::visit(overloaded{
+                        [](std::monostate) {return 0;},
+                        [](String::String s) {return Conversion::stringToInt<int>(s);},
+                        [](int i) {return i;}
                 }, self.value);
         }
 
@@ -39,7 +48,7 @@ namespace Cash
                         NodeUnaryOp *unop_node = static_cast<NodeUnaryOp *>(node);
                         EvalValue val = self.evaluate(unop_node->value);
 
-                        int int_val = Melon::Conversion::stringToInt<int>(val.toString());
+                        int int_val = val.toInt();
                         
                         int result;
                         if (unop_node->op == TokenType::Plus)
@@ -56,8 +65,8 @@ namespace Cash
                         EvalValue left = self.evaluate(binop_node->left);
                         EvalValue right = self.evaluate(binop_node->right);
 
-                        int left_val = Melon::Conversion::stringToInt<int>(left.toString());
-                        int right_val = Melon::Conversion::stringToInt<int>(right.toString());
+                        int left_val = left.toInt();
+                        int right_val = right.toInt();
 
                         int result;
                         if (binop_node->op == TokenType::Plus)
@@ -76,7 +85,7 @@ namespace Cash
                 } else if (isNodeType<NodeInteger>(node)) {
                         NodeInteger *int_node = static_cast<NodeInteger *>(node);
                         EvalValue value = {
-                                Melon::Conversion::stringToInt<int>(int_node->value)
+                                Conversion::stringToInt<int>(int_node->value)
                         };
                         return value;
                 }

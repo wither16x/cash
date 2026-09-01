@@ -23,6 +23,7 @@ namespace Cash
                 > value;
         
                 Melon::String::String toString(this const EvalValue &self);
+                int toInt(this const EvalValue &self);
         };
 
         inline constexpr EvalValue null_value = {std::monostate()};
