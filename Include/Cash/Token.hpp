@@ -4,8 +4,6 @@
 
 #include <Melon/String.hpp>
 
-using namespace Melon;
-
 namespace Cash
 {
         enum class TokenType
@@ -27,8 +25,8 @@ namespace Cash
         {
                 Position position;
                 TokenType type;
-                String::String value = "";
+                Melon::String::String value = "";
         };
 
-        String::String tokenTypeToString(TokenType toktype);
+        Melon::String::String tokenTypeToString(TokenType toktype);
 } // namespace Cash

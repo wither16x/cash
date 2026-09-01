@@ -17,51 +17,56 @@ namespace Cash
         {
                 self.reset();
 
-                for (; self.cursor < self.data.length(); self.cursor++) {
-                        self.curr_integer = "";
-
-                        self.advance();
-
+                while (self.cursor < self.data.length()) {
                         // skip whitespaces, tabs and newlines
-                        while (self.foundBlank())
+                        while (self.cursor < self.data.length() and self.foundBlank())
                                 self.advance();
 
-                        // handle integers
-                        while (self.foundDigit()) {
-                                self.found_integer = true;
-                                self.curr_integer.appendChar(self.data[self.cursor]);
-                                ++self.cursor;
-                                ++self.position.column;
-                        }
+                        if (self.cursor >= self.data.length())
+                                break;
 
-                        if (self.found_integer) {
-                                self.tokens.emplaceBack(self.position, TokenType::Integer, self.curr_integer);
-                                self.found_integer = false;
+                        Position start = self.position;
+
+                        // handle integers
+                        if (self.foundDigit()) {
+                                self.curr_integer = "";
+                                while (self.cursor < self.data.length() and self.foundDigit()) {
+                                        self.curr_integer.appendChar(self.data[self.cursor]);
+                                        self.advance();
+                                }
+                                self.tokens.emplaceBack(start, TokenType::Integer, self.curr_integer);
+                                continue;
                         }
 
                         switch (self.data[self.cursor]) {
                         case '+':
                                 self.tokens.emplaceBack(self.position, TokenType::Plus, "+");
+                                self.advance();
                                 break;
 
                         case '-':
                                 self.tokens.emplaceBack(self.position, TokenType::Minus, "-");
+                                self.advance();
                                 break;
 
                         case '*':
                                 self.tokens.emplaceBack(self.position, TokenType::Star, "*");
+                                self.advance();
                                 break;
 
                         case '/':
                                 self.tokens.emplaceBack(self.position, TokenType::Slash, "/");
+                                self.advance();
                                 break;
 
                         case '(':
                                 self.tokens.emplaceBack(self.position, TokenType::LeftParenthesis, "(");
+                                self.advance();
                                 break;
 
                         case ')':
                                 self.tokens.emplaceBack(self.position, TokenType::RightParenthesis, ")");
+                                self.advance();
                                 break;
 
                         case FileSystem::EndOfFile:
@@ -73,6 +78,7 @@ namespace Cash
 
                         default:
                                 illegalCharacterError(self.data[self.cursor], self.position);
+                                self.advance();
                                 break;
                         }
                 }
@@ -87,13 +93,14 @@ namespace Cash
 
         void Lexer::advance(this Lexer &self)
         {
-                ++self.position.column;
-
                 if (self.data[self.cursor] == '\n') {
                         self.position.column = 0;
                         ++self.position.row;
-                        ++self.cursor;
+                } else {
+                        ++self.position.column;
                 }
+
+                ++self.cursor;
         }
 
         void Lexer::setData(this Lexer &self, const String::String &new_data)
