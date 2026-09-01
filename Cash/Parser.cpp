@@ -1,6 +1,7 @@
 #include <Cash/Parser.hpp>
 #include <Cash/Token.hpp>
 #include <Cash/Ast.hpp>
+#include <Cash/Error.hpp>
 
 using namespace Melon;
 
@@ -35,7 +36,7 @@ namespace Cash
                         NodeExpr *right = self.parseTerm();
                         if (not right) {
                                 delete left;
-                                return nullptr;
+                                        return nullptr;
                         }
 
                         NodeBinaryOp *node = new NodeBinaryOp;
@@ -81,8 +82,10 @@ namespace Cash
 
         NodeExpr *Parser::parsePrimaryExpr(this Parser &self)
         {
-                if (self.token_cursor >= self.tokens.length())
+                if (self.token_cursor >= self.tokens.length()) {
+                        syntaxError(self.tokens[self.token_cursor - 1].value, self.tokens[self.token_cursor - 1].position);
                         return nullptr;
+                }
 
                 Token tok = self.tokens[self.token_cursor];
                 if (tok.type == TokenType::Plus or tok.type == TokenType::Minus)
@@ -95,6 +98,7 @@ namespace Cash
 
                         if (self.token_cursor >= self.tokens.length() or self.tokens[self.token_cursor].type != TokenType::RightParenthesis) {
                                 delete inner;
+                                syntaxError(self.tokens[self.token_cursor - 1].value, self.tokens[self.token_cursor - 1].position);
                                 return nullptr;
                         }
 
@@ -144,7 +148,7 @@ namespace Cash
                 }
 
                 return nullptr;
-        }
+        };
 
         void Parser::reset(this Parser &self)
         {
