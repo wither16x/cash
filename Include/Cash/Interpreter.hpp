@@ -26,7 +26,7 @@ namespace Cash
                 Melon::String::String toString(this const EvalValue &self);
         };
 
-        inline EvalValue null_value = {std::monostate()};
+        inline constexpr EvalValue null_value = {std::monostate()};
 
         using eval_values_t = Melon::Vector::Vector<EvalValue>;
 
