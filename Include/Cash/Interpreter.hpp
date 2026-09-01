@@ -8,8 +8,7 @@
 
 namespace Cash
 {
-        struct EvalValue {
-        private:
+        class EvalValue {
                 template<class... Ts>
                 struct overloaded : Ts...
                 {
