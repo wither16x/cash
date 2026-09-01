@@ -12,6 +12,7 @@ namespace Cash
         {
                 ast_t nodes;
                 tokens_t tokens;
+                NodeAllocator node_allocator;
                 Melon::Typing::USize token_cursor;
                 Melon::Typing::USize node_cursor;
 

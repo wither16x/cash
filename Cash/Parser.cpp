@@ -23,8 +23,10 @@ namespace Cash
         NodeExpr *Parser::parseExpr(this Parser &self)
         {
                 NodeExpr *left = self.parseTerm();
-                if (not left)
+                if (not left) {
+                        self.node_allocator.freeAll();
                         return nullptr;
+                }
 
                 while (self.token_cursor < self.tokens.length()) {
                         TokenType op = self.tokens[self.token_cursor].type;
@@ -35,11 +37,11 @@ namespace Cash
 
                         NodeExpr *right = self.parseTerm();
                         if (not right) {
-                                delete left;
-                                        return nullptr;
+                                self.node_allocator.freeAll();
+                                return nullptr;
                         }
 
-                        NodeBinaryOp *node = new NodeBinaryOp;
+                        NodeBinaryOp *node = self.node_allocator.allocateNode<NodeBinaryOp>();
                         node->left = left;
                         node->right = right;
                         node->op = op;
@@ -53,8 +55,10 @@ namespace Cash
         NodeExpr *Parser::parseTerm(this Parser &self)
         {
                 NodeExpr *left = self.parsePrimaryExpr();
-                if (not left)
+                if (not left) {
+                        self.node_allocator.freeAll();
                         return nullptr;
+                }
 
                 while (self.token_cursor < self.tokens.length()) {
                         TokenType op = self.tokens[self.token_cursor].type;
@@ -69,7 +73,7 @@ namespace Cash
                                 return nullptr;
                         }
 
-                        NodeBinaryOp *node = new NodeBinaryOp;
+                        NodeBinaryOp *node = self.node_allocator.allocateNode<NodeBinaryOp>();
                         node->left = left;
                         node->right = right;
                         node->op = op;
@@ -84,6 +88,7 @@ namespace Cash
         {
                 if (self.token_cursor >= self.tokens.length()) {
                         syntaxError(self.tokens[self.token_cursor - 1].value, self.tokens[self.token_cursor - 1].position);
+                        self.node_allocator.freeAll();
                         return nullptr;
                 }
 
@@ -97,8 +102,8 @@ namespace Cash
                         NodeExpr *inner = self.parseExpr();
 
                         if (self.token_cursor >= self.tokens.length() or self.tokens[self.token_cursor].type != TokenType::RightParenthesis) {
-                                delete inner;
                                 syntaxError(self.tokens[self.token_cursor - 1].value, self.tokens[self.token_cursor - 1].position);
+                                self.node_allocator.freeAll();
                                 return nullptr;
                         }
 
@@ -112,20 +117,26 @@ namespace Cash
 
         NodeUnaryOp *Parser::parseUnaryOp(this Parser &self)
         {
-                if (self.token_cursor >= self.tokens.length())
+                if (self.token_cursor >= self.tokens.length()) {
+                        self.node_allocator.freeAll();
                         return nullptr;
+                }
 
                 Token tok = self.tokens[self.token_cursor];
-                if (tok.type != TokenType::Plus and tok.type != TokenType::Minus)
+                if (tok.type != TokenType::Plus and tok.type != TokenType::Minus) {
+                        self.node_allocator.freeAll();
                         return nullptr;
+                }
 
                 ++self.token_cursor;
 
                 NodeExpr *value = self.parsePrimaryExpr();
-                if (not value)
+                if (not value) {
+                        self.node_allocator.freeAll();
                         return nullptr;
+                }
 
-                NodeUnaryOp *node = new NodeUnaryOp;
+                NodeUnaryOp *node = self.node_allocator.allocateNode<NodeUnaryOp>();
                 node->value = value;
                 node->op = tok.type;
 
@@ -134,19 +145,22 @@ namespace Cash
 
         NodeInteger *Parser::parseInteger(this Parser &self)
         {
-                if (self.token_cursor >= self.tokens.length())
+                if (self.token_cursor >= self.tokens.length()) {
+                        self.node_allocator.freeAll();
                         return nullptr;
+                }
 
                 Token tok = self.tokens[self.token_cursor];
                 if (tok.type == TokenType::Integer) {
                         ++self.token_cursor;
 
-                        NodeInteger *node = new NodeInteger;
+                        NodeInteger *node = self.node_allocator.allocateNode<NodeInteger>();
                         node->value = tok.value;
 
                         return node;
                 }
 
+                self.node_allocator.freeAll();
                 return nullptr;
         };
 
@@ -155,6 +169,7 @@ namespace Cash
                 self.token_cursor = 0;
                 self.node_cursor = 0;
                 self.nodes.clear();
+                self.node_allocator.freeAll();
         }
 
         void Parser::setTokens(this Parser &self, const tokens_t &new_tokens)

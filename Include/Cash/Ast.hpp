@@ -74,4 +74,21 @@ namespace Cash
                 const std::type_info &node_type = typeid(*node);
                 return node_type == typeid(T);
         }
+
+        class NodeAllocator
+        {
+                ast_t nodes;
+
+        public:
+                template<typename T>
+                T *allocateNode(this NodeAllocator &self)
+                {
+                        T *node = new T;
+                        self.nodes.pushBack(node);
+                        return node;
+                }
+
+                void freeNode(this NodeAllocator &self, Node *node);
+                void freeAll(this NodeAllocator &self);
+        };
 } // namespace Cash
