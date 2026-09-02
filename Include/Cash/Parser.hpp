@@ -21,11 +21,14 @@ namespace Cash
                 Parser(const tokens_t &tokens);
 
                 void parse(this Parser &self);
+                NodeDecl *parseDecl(this Parser &self);
+                NodeVarDecl *parseVarDecl(this Parser &self);
                 NodeExpr *parseExpr(this Parser &self);
                 NodeExpr *parseTerm(this Parser &self);
                 NodeExpr *parsePrimaryExpr(this Parser &self);
                 NodeUnaryOp *parseUnaryOp(this Parser &self);
                 NodeInteger *parseInteger(this Parser &self);
+                NodeName *parseName(this Parser &self);
 
                 void reset(this Parser &self);
                 void setTokens(this Parser &self, const tokens_t &new_tokens);

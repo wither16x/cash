@@ -28,6 +28,9 @@ namespace Cash
                         parser.setTokens(tokens);
                         parser.parse();
 
+                        // for (auto &node : parser.getNodes())
+                        //         Print::println("{}", node->info());
+
                         ast_t nodes = parser.getNodes();
                         interpreter.setNodes(nodes);
                         interpreter.interpret();

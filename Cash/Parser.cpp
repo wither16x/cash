@@ -15,9 +15,53 @@ namespace Cash
         {
                 self.reset();
 
-                NodeExpr *expr = self.parseExpr();
-                if (expr)
+                if (NodeExpr *expr = self.parseExpr())
                         self.nodes.pushBack(expr);
+                else if (NodeDecl *decl = self.parseDecl())
+                        self.nodes.pushBack(decl);
+        }
+
+        NodeDecl *Parser::parseDecl(this Parser &self)
+        {
+                if (self.token_cursor >= self.tokens.length()) {
+                        syntaxError(self.tokens[self.token_cursor - 1].value, self.tokens[self.token_cursor - 1].position);
+                        self.node_allocator.freeAll();
+                        return nullptr;
+                }
+
+                Token modifier = self.tokens[self.token_cursor];
+                if (modifier.type == TokenType::Var) {
+                        ++self.token_cursor;
+                        return self.parseVarDecl();
+                }
+
+                self.node_allocator.freeAll();
+                return nullptr;
+        }
+
+        NodeVarDecl *Parser::parseVarDecl(this Parser &self)
+        {
+                Token name = self.tokens[self.token_cursor];
+                if (name.type == TokenType::Name) {
+                        ++self.token_cursor;
+                        Token op = self.tokens[self.token_cursor];
+                        if (op.type == TokenType::Equal) {
+                                ++self.token_cursor;
+                                NodeExpr *value = self.parseExpr();
+
+                                NodeVarDecl *node = self.node_allocator.allocateNode<NodeVarDecl>();
+                                node->name = name.value;
+                                node->value = value;
+
+                                return node;
+                        } else {
+                                self.node_allocator.freeAll();
+                                return nullptr;
+                        }
+                }
+
+                self.node_allocator.freeAll();
+                return nullptr;
         }
 
         NodeExpr *Parser::parseExpr(this Parser &self)
@@ -112,7 +156,9 @@ namespace Cash
                         return inner;
                 }
 
-                return self.parseInteger();
+                if (NodeInteger *int_node = self.parseInteger())
+                        return int_node;
+                return self.parseName();
         }
 
         NodeUnaryOp *Parser::parseUnaryOp(this Parser &self)
@@ -163,6 +209,27 @@ namespace Cash
                 self.node_allocator.freeAll();
                 return nullptr;
         };
+
+        NodeName *Parser::parseName(this Parser &self)
+        {
+                if (self.token_cursor >= self.tokens.length()) {
+                        self.node_allocator.freeAll();
+                        return nullptr;
+                }
+
+                Token tok = self.tokens[self.token_cursor];
+                if (tok.type == TokenType::Name) {
+                        ++self.token_cursor;
+
+                        NodeName *node = self.node_allocator.allocateNode<NodeName>();
+                        node->name = tok.value;
+
+                        return node;
+                }
+
+                self.node_allocator.freeAll();
+                return nullptr;
+        }
 
         void Parser::reset(this Parser &self)
         {

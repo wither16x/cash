@@ -29,6 +29,27 @@ namespace Cash
                 }
         };
 
+        struct NodeDecl : Node
+        {
+                inline Melon::String::String info() const override
+                {
+                        return "NodeDecl()";
+                }
+        };
+
+        struct NodeVarDecl : NodeDecl
+        {
+                Melon::String::String name;
+                NodeExpr *value;
+
+                inline Melon::String::String info() const override
+                {
+                        return Melon::Fmt::formatString("NodeVarDecl(name={}, value={})",
+                                this->name, this->value->info()
+                        );
+                }
+        };
+
         struct NodeUnaryOp : NodeExpr
         {
                 NodeExpr *value;
@@ -64,6 +85,18 @@ namespace Cash
                 {
                         return Melon::Fmt::formatString("NodeInteger(value={})",
                                 this->value
+                        );
+                }
+        };
+
+        struct NodeName : NodeExpr
+        {
+                Melon::String::String name;
+
+                inline Melon::String::String info() const override
+                {
+                        return Melon::Fmt::formatString("NodeName(name={})",
+                                this->name
                         );
                 }
         };

@@ -10,12 +10,15 @@ namespace Cash
         {
                 const char *token_type_strings[] = {
                         "Integer",
+                        "Name",
                         "Plus",
                         "Minus",
                         "Star",
                         "Slash",
+                        "Equal",
                         "LeftParenthesis",
                         "RightParenthesis",
+                        "Var",
                         "EndOfFile"
                 };
         } // anonymous namespace
