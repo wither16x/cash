@@ -14,6 +14,7 @@ namespace Cash
                 Position position;
                 Melon::Typing::USize cursor;
                 Melon::String::String curr_integer;
+                Melon::String::String curr_name;
                 Melon::String::String data;
 
         public:

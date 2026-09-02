@@ -11,14 +11,18 @@ namespace Cash
         enum class TokenType
         {
                 Integer,
+                Name,
 
                 Plus,
                 Minus,
                 Star,
                 Slash,
+                Equal,
 
                 LeftParenthesis,
                 RightParenthesis,
+
+                Var,
 
                 EndOfFile
         };
@@ -29,8 +33,12 @@ namespace Cash
                 constexpr char Minus            = '-';
                 constexpr char Star             = '*';
                 constexpr char Slash            = '/';
+                constexpr char Equal            = '=';
+
                 constexpr char LeftParenthesis  = '(';
                 constexpr char RightParenthesis = ')';
+
+                constexpr char Var[]            = "var";
         } // namespace TokenValues
 
         struct Token

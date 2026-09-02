@@ -1,5 +1,5 @@
-#include "Cash/Token.hpp"
 #include <Cash/Lexer.hpp>
+#include <Cash/Token.hpp>
 #include <Cash/Error.hpp>
 
 #include <Melon/String.hpp>
@@ -27,7 +27,6 @@ namespace Cash
                                 break;
 
                         Position start = self.position;
-
                         // handle integers
                         if (self.foundDigit()) {
                                 self.curr_integer = "";
@@ -36,6 +35,23 @@ namespace Cash
                                         self.advance();
                                 }
                                 self.tokens.emplaceBack(start, TokenType::Integer, self.curr_integer);
+                                continue;
+                        }
+
+                        start = self.position;
+                        // names start with a character or a _
+                        if (isalpha(self.data[self.cursor]) or self.data[self.cursor] == '_') {
+                                self.curr_name = "";
+                                while (self.cursor < self.data.length() and (isalnum(self.data[self.cursor]) or self.data[self.cursor] == '_')) {
+                                        self.curr_name.appendChar(self.data[self.cursor]);
+                                        self.advance();
+                                }
+
+                                if (self.curr_name == TokenValues::Var) {
+                                        self.tokens.emplaceBack(start, TokenType::Var, self.curr_name);
+                                } else {
+                                        self.tokens.emplaceBack(start, TokenType::Name, self.curr_name);
+                                }
                                 continue;
                         }
 
@@ -57,6 +73,11 @@ namespace Cash
 
                         case TokenValues::Slash:
                                 self.tokens.emplaceBack(self.position, TokenType::Slash, "/");
+                                self.advance();
+                                break;
+
+                        case TokenValues::Equal:
+                                self.tokens.emplaceBack(self.position, TokenType::Equal, "=");
                                 self.advance();
                                 break;
 
