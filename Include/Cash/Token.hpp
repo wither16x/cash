@@ -23,6 +23,16 @@ namespace Cash
                 EndOfFile
         };
 
+        namespace TokenValues
+        {
+                constexpr char Plus             = '+';
+                constexpr char Minus            = '-';
+                constexpr char Star             = '*';
+                constexpr char Slash            = '/';
+                constexpr char LeftParenthesis  = '(';
+                constexpr char RightParenthesis = ')';
+        } // namespace TokenValues
+
         struct Token
         {
                 Position position;

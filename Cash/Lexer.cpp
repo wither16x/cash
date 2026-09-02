@@ -1,3 +1,4 @@
+#include "Cash/Token.hpp"
 #include <Cash/Lexer.hpp>
 #include <Cash/Error.hpp>
 
@@ -39,32 +40,32 @@ namespace Cash
                         }
 
                         switch (self.data[self.cursor]) {
-                        case '+':
+                        case TokenValues::Plus:
                                 self.tokens.emplaceBack(self.position, TokenType::Plus, "+");
                                 self.advance();
                                 break;
 
-                        case '-':
+                        case TokenValues::Minus:
                                 self.tokens.emplaceBack(self.position, TokenType::Minus, "-");
                                 self.advance();
                                 break;
 
-                        case '*':
+                        case TokenValues::Star:
                                 self.tokens.emplaceBack(self.position, TokenType::Star, "*");
                                 self.advance();
                                 break;
 
-                        case '/':
+                        case TokenValues::Slash:
                                 self.tokens.emplaceBack(self.position, TokenType::Slash, "/");
                                 self.advance();
                                 break;
 
-                        case '(':
+                        case TokenValues::LeftParenthesis:
                                 self.tokens.emplaceBack(self.position, TokenType::LeftParenthesis, "(");
                                 self.advance();
                                 break;
 
-                        case ')':
+                        case TokenValues::RightParenthesis:
                                 self.tokens.emplaceBack(self.position, TokenType::RightParenthesis, ")");
                                 self.advance();
                                 break;
