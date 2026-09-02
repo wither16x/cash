@@ -1,6 +1,7 @@
 #include <Cash/Ast.hpp>
 #include <Cash/Token.hpp>
 #include <Cash/Interpreter.hpp>
+#include <Cash/Error.hpp>
 
 #include <Melon/Conversion.hpp>
 
@@ -69,14 +70,19 @@ namespace Cash
                         int right_val = right.toInt();
 
                         int result;
-                        if (binop_node->op == TokenType::Plus)
+                        if (binop_node->op == TokenType::Plus) {
                                 result = left_val + right_val;
-                        else if (binop_node->op == TokenType::Minus)
+                        } else if (binop_node->op == TokenType::Minus) {
                                 result = left_val - right_val;
-                        else if (binop_node->op == TokenType::Star)
+                        } else if (binop_node->op == TokenType::Star) {
                                 result = left_val * right_val;
-                        else if (binop_node->op == TokenType::Slash)
+                        } else if (binop_node->op == TokenType::Slash) {
+                                if (right_val == 0) {
+                                        divisionByZeroError(left_val);
+                                        return null_value;
+                                }
                                 result = left_val / right_val;
+                        }
 
                         EvalValue value = {
                                 result

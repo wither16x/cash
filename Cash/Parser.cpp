@@ -69,7 +69,7 @@ namespace Cash
 
                         NodeExpr *right = self.parsePrimaryExpr();
                         if (not right) {
-                                delete left;
+                                self.node_allocator.freeAll();
                                 return nullptr;
                         }
 
