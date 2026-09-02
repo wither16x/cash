@@ -32,8 +32,10 @@ namespace Cash
                         interpreter.setNodes(nodes);
                         interpreter.interpret();
 
-                        for (auto &val : interpreter.getEvalValues())
-                                Print::println("{}", val.toString());
+                        for (auto &val : interpreter.getEvalValues()) {
+                                if (val.value != null_value.value)
+                                        Print::println("{}", val.toString());
+                        }
                 }
         }
 } // namespace Cash
