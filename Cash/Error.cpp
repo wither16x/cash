@@ -19,4 +19,18 @@ namespace Cash
                         str, pos.row, pos.column
                 );
         }
+
+        void alreadyDeclaredError(const Melon::String::String &name)
+        {
+                Print::println("error: symbol \"{}\" is already declared",
+                        name
+                );
+        }
+
+        void notDeclaredError(const Melon::String::String &name)
+        {
+                Print::println("error: symbol \"{}\" is not declared",
+                        name
+                );
+        }
 } // namespace Cash

@@ -1,0 +1,73 @@
+#include <Cash/Symbol.hpp>
+#include <Cash/Error.hpp>
+
+#include <Melon/String.hpp>
+
+using namespace Melon;
+
+namespace Cash
+{
+        Symbol::Symbol(const String::String &name, const EvalValue &value, SymbolType type)
+                : name(name), value(value), type(type)
+        {}
+
+        SymbolTable::SymbolTable()
+        {
+                this->symbols.emplaceBack(
+                        "__undefined__",
+                        null_value,
+                        SymbolType::Variable
+                );
+        }
+
+        bool SymbolTable::addSymbol(this SymbolTable &self, const Symbol &symbol)
+        {
+                if (self.hasSymbol(symbol.name)) {
+                        alreadyDeclaredError(symbol.name);
+                        return false;
+                }
+
+                self.symbols.pushBack(symbol);
+                return true;
+        }
+
+        bool SymbolTable::removeSymbol(this SymbolTable &self, const Symbol &symbol)
+        {
+                for (Melon::Typing::USize i = 0; i < self.symbols.length(); i++) {
+                        if (self.symbols[i].name == symbol.name) {
+                                self.symbols.erase(i);
+                                return true;
+                        }
+                }
+
+                notDeclaredError(symbol.name);
+                return false;
+        }
+
+        void SymbolTable::clear(this SymbolTable &self)
+        {
+                Typing::USize i = 0;
+                while (self.symbols[i].name != "__undefined__")
+                        self.symbols.popBack();
+        }
+
+        bool SymbolTable::hasSymbol(this const SymbolTable &self, const String::String &name)
+        {
+                for (auto &sym : self.symbols) {
+                        if (sym.name == name)
+                                return true;
+                }
+
+                return false;
+        }
+
+        const Symbol &SymbolTable::getSymbol(this const SymbolTable &self, const String::String &name)
+        {
+                for (auto &sym : self.symbols) {
+                        if (sym.name == name)
+                                return sym;
+                }
+
+                return self.symbols[0];
+        }
+} // namespace Cash

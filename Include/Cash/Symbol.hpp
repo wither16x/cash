@@ -1,0 +1,37 @@
+#pragma once
+
+#include <Cash/Value.hpp>
+
+#include <Melon/String.hpp>
+#include <Melon/Vector.hpp>
+
+namespace Cash
+{
+        enum class SymbolType
+        {
+                Variable
+        };
+
+        struct Symbol
+        {
+                Melon::String::String name;
+                EvalValue value;
+                SymbolType type;
+
+                Symbol(const Melon::String::String &name, const EvalValue &value, SymbolType type);
+        };
+
+        class SymbolTable
+        {
+                Melon::Vector::Vector<Symbol> symbols;
+
+        public:
+                SymbolTable();
+
+                bool addSymbol(this SymbolTable &self, const Symbol &symbol);
+                bool removeSymbol(this SymbolTable &self, const Symbol &symbol);
+                void clear(this SymbolTable &self);
+                bool hasSymbol(this const SymbolTable &self, const Melon::String::String &name);
+                const Symbol &getSymbol(this const SymbolTable &self, const Melon::String::String &name);
+        };
+} // namespace Cash

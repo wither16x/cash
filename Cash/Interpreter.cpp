@@ -9,24 +9,6 @@ using namespace Melon;
 
 namespace Cash
 {
-        String::String EvalValue::toString(this const EvalValue &self)
-        {
-                return std::visit(overloaded{
-                        [](std::monostate) {return String::String("null");},
-                        [](String::String s) {return s;},
-                        [](int i) {return Conversion::intToString(i, Conversion::Base::Decimal);}
-                }, self.value);
-        }
-
-        int EvalValue::toInt(this const EvalValue &self)
-        {
-                return std::visit(overloaded{
-                        [](std::monostate) {return 0;},
-                        [](String::String s) {return Conversion::stringToInt<int>(s);},
-                        [](int i) {return i;}
-                }, self.value);
-        }
-
         Interpreter::Interpreter(const ast_t &nodes)
                 : nodes(nodes)
         {}
@@ -45,6 +27,21 @@ namespace Cash
                         return null_value;
                 } else if (isNodeType<NodeExpr>(node)) {
                         return null_value;
+                } else if (isNodeType<NodeDecl>(node)) {
+                        return null_value;
+                } else if (isNodeType<NodeVarDecl>(node)) {
+                        NodeVarDecl *vardecl_node = static_cast<NodeVarDecl *>(node);
+                        EvalValue value = self.evaluate(vardecl_node->value);
+
+                        Symbol symbol(
+                                vardecl_node->name,
+                                value,
+                                SymbolType::Variable
+                        );
+                        if (not self.symbol_table.addSymbol(symbol))
+                                return null_value;
+                        
+                        return value;
                 } else if (isNodeType<NodeUnaryOp>(node)) {
                         NodeUnaryOp *unop_node = static_cast<NodeUnaryOp *>(node);
                         EvalValue val = self.evaluate(unop_node->value);
@@ -94,6 +91,14 @@ namespace Cash
                                 Conversion::stringToInt<int>(int_node->value)
                         };
                         return value;
+                } else if (isNodeType<NodeName>(node)) {
+                        NodeName *name_node = static_cast<NodeName *>(node);
+                        const Symbol &symbol = self.symbol_table.getSymbol(name_node->name);
+                        if (symbol.name == "__undefined__")
+                                return null_value;
+
+                        EvalValue value = symbol.value;
+                        return value;
                 }
 
                 return null_value;
@@ -102,6 +107,7 @@ namespace Cash
         void Interpreter::reset(this Interpreter &self)
         {
                 self.eval_values.clear();
+                self.symbol_table.clear();
         }
 
         void Interpreter::setNodes(this Interpreter &self, const ast_t &new_nodes)
