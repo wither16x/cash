@@ -87,6 +87,7 @@ namespace Cash
                         return value;
                 } else if (isNodeType<NodeInteger>(node)) {
                         NodeInteger *int_node = static_cast<NodeInteger *>(node);
+                        
                         EvalValue value = {
                                 Conversion::stringToInt<int>(int_node->value)
                         };
@@ -94,7 +95,7 @@ namespace Cash
                 } else if (isNodeType<NodeName>(node)) {
                         NodeName *name_node = static_cast<NodeName *>(node);
                         const Symbol &symbol = self.symbol_table.getSymbol(name_node->name);
-                        if (symbol.name == "__undefined__")
+                        if (not symbol.isDefined())
                                 return null_value;
 
                         EvalValue value = symbol.value;

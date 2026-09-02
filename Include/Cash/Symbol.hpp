@@ -19,6 +19,11 @@ namespace Cash
                 SymbolType type;
 
                 Symbol(const Melon::String::String &name, const EvalValue &value, SymbolType type);
+                
+                inline constexpr bool isDefined(this const Symbol &self)
+                {
+                        return self.name != "__undefined__";
+                }
         };
 
         class SymbolTable
