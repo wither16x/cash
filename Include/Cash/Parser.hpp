@@ -34,6 +34,7 @@ namespace Cash
                 void reset(this Parser &self);
                 void setTokens(this Parser &self, const tokens_t &new_tokens);
                 bool expect(this const Parser &self, TokenType token);
+                const Token &advance(this Parser &self);
         
                 const ast_t &getNodes(this const Parser &self);
 

@@ -30,7 +30,7 @@ namespace Cash
                 }
 
                 if (self.expect(TokenType::Var)) {
-                        ++self.token_cursor;
+                        self.advance();
                         return self.parseVarDecl();
                 }
 
@@ -40,9 +40,8 @@ namespace Cash
 
         NodeVarDecl *Parser::parseVarDecl(this Parser &self)
         {
-                Token name = self.currentToken();
                 if (self.expect(TokenType::Name)) {
-                        ++self.token_cursor;
+                        Token name = self.advance();
 
                         if (self.token_cursor >= self.tokens.length()) {
                                 self.node_allocator.freeAll();
@@ -50,7 +49,7 @@ namespace Cash
                         }
 
                         if (self.expect(TokenType::Equal)) {
-                                ++self.token_cursor;
+                                self.advance();
                                 NodeExpr *value = self.parseExpr();
 
                                 NodeVarDecl *node = self.node_allocator.allocateNode<NodeVarDecl>();
@@ -77,11 +76,10 @@ namespace Cash
                 }
 
                 while (self.token_cursor < self.tokens.length()) {
-                        TokenType op = self.currentToken().type;
                         if (not self.expect(TokenType::Plus) and not self.expect(TokenType::Minus))
                                 break;
 
-                        ++self.token_cursor;
+                        Token op = self.advance();
 
                         NodeExpr *right = self.parseTerm();
                         if (not right) {
@@ -92,7 +90,7 @@ namespace Cash
                         NodeBinaryOp *node = self.node_allocator.allocateNode<NodeBinaryOp>();
                         node->left = left;
                         node->right = right;
-                        node->op = op;
+                        node->op = op.type;
 
                         left = node;
                 }
@@ -109,11 +107,10 @@ namespace Cash
                 }
 
                 while (self.token_cursor < self.tokens.length()) {
-                        TokenType op = self.currentToken().type;
                         if (not self.expect(TokenType::Star) and not self.expect(TokenType::Slash))
                                 break;
 
-                        ++self.token_cursor;
+                        Token op = self.advance();
 
                         NodeExpr *right = self.parsePrimaryExpr();
                         if (not right) {
@@ -124,7 +121,7 @@ namespace Cash
                         NodeBinaryOp *node = self.node_allocator.allocateNode<NodeBinaryOp>();
                         node->left = left;
                         node->right = right;
-                        node->op = op;
+                        node->op = op.type;
 
                         left = node;
                 }
@@ -144,7 +141,7 @@ namespace Cash
                         return self.parseUnaryOp();
 
                 if (self.expect(TokenType::LeftParenthesis)) {
-                        ++self.token_cursor;
+                        self.advance();
 
                         NodeExpr *inner = self.parseExpr();
 
@@ -178,7 +175,7 @@ namespace Cash
                         return nullptr;
                 }
 
-                ++self.token_cursor;
+                self.advance();
 
                 NodeExpr *value = self.parsePrimaryExpr();
                 if (not value) {
@@ -201,7 +198,7 @@ namespace Cash
                 }
 
                 if (self.expect(TokenType::Integer)) {
-                        ++self.token_cursor;
+                        self.advance();
 
                         NodeInteger *node = self.node_allocator.allocateNode<NodeInteger>();
                         node->value = self.precedentToken().value;
@@ -221,7 +218,7 @@ namespace Cash
                 }
 
                 if (self.expect(TokenType::Name)) {
-                        ++self.token_cursor;
+                        self.advance();
 
                         NodeName *node = self.node_allocator.allocateNode<NodeName>();
                         node->name = self.precedentToken().value;
@@ -242,9 +239,8 @@ namespace Cash
                         return nullptr;
                 }
 
-                Token name = self.currentToken();
                 if (self.expect(TokenType::Name)) {
-                        ++self.token_cursor;
+                        Token name = self.advance();
 
                         if (self.token_cursor >= self.tokens.length()) {
                                 self.token_cursor = start_cursor;
@@ -253,8 +249,8 @@ namespace Cash
                         }
 
                         if (self.expect(TokenType::Equal)) {
-                                ++self.token_cursor;
-
+                                self.advance();
+                                
                                 NodeExpr *value = self.parseExpr();
                                 if (value) {
                                         NodeAssign *node = self.node_allocator.allocateNode<NodeAssign>();
@@ -289,6 +285,13 @@ namespace Cash
                 if (self.token_cursor >= self.tokens.length())
                         return false;
                 return self.currentToken().type == token;
+        }
+
+        const Token &Parser::advance(this Parser &self)
+        {
+                const Token &tok = self.currentToken();
+                ++self.token_cursor;
+                return tok;
         }
 
         const ast_t &Parser::getNodes(this const Parser &self)
