@@ -16,7 +16,7 @@ namespace Cash
                 this->symbols.emplaceBack(
                         "__undefined__",
                         null_value,
-                        SymbolType::Variable
+                        SymbolType::Constant
                 );
         }
 
@@ -76,6 +76,11 @@ namespace Cash
         {
                 for (auto &sym : self.symbols) {
                         if (sym.name == name) {
+                                if (sym.type == SymbolType::Constant) {
+                                        isConstantError(name);
+                                        return;
+                                }
+
                                 sym.value = new_value;
                                 return;
                         }

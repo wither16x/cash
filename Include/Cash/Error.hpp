@@ -11,6 +11,7 @@ namespace Cash
         void syntaxError(const Melon::String::String &str, Position pos);
         void alreadyDeclaredError(const Melon::String::String &name);
         void notDeclaredError(const Melon::String::String &name);
+        void isConstantError(const Melon::String::String &name);
 
         template<typename T>
         void divisionByZeroError(T x)

@@ -27,6 +27,11 @@ namespace Cash
                 );
         }
 
+        void isConstantError(const Melon::String::String &name)
+        {
+                Print::println("\"{}\" is a constant", name);
+        }
+
         void notDeclaredError(const Melon::String::String &name)
         {
                 Print::println("error: symbol \"{}\" is not declared",

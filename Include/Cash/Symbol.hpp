@@ -9,7 +9,8 @@ namespace Cash
 {
         enum class SymbolType
         {
-                Variable
+                Variable,
+                Constant
         };
 
         struct Symbol

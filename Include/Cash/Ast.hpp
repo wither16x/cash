@@ -50,6 +50,19 @@ namespace Cash
                 }
         };
 
+        struct NodeConstDecl : NodeDecl
+        {
+                Melon::String::String name;
+                NodeExpr *value;
+
+                inline Melon::String::String info() const override
+                {
+                        return Melon::Fmt::formatString("NodeConstDecl(name={}, value={})",
+                                this->name, this->value->info()
+                        );
+                }
+        };
+
         struct NodeUnaryOp : NodeExpr
         {
                 NodeExpr *value;

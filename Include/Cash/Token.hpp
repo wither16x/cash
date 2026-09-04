@@ -23,6 +23,7 @@ namespace Cash
                 RightParenthesis,
 
                 Var,
+                Const,
 
                 EndOfFile
         };
@@ -39,6 +40,7 @@ namespace Cash
                 constexpr char RightParenthesis = ')';
 
                 constexpr char Var[]            = "var";
+                constexpr char Const[]          = "const";
         } // namespace TokenValues
 
         struct Token

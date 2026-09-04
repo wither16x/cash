@@ -42,6 +42,19 @@ namespace Cash
                                 return null_value;
                         
                         return value;
+                } else if (isNodeType<NodeConstDecl>(node)) {
+                        NodeConstDecl *vardecl_node = static_cast<NodeConstDecl *>(node);
+                        EvalValue value = self.evaluate(vardecl_node->value);
+
+                        Symbol symbol(
+                                vardecl_node->name,
+                                value,
+                                SymbolType::Constant
+                        );
+                        if (not self.symbol_table.addSymbol(symbol))
+                                return null_value;
+                        
+                        return value;
                 } else if (isNodeType<NodeUnaryOp>(node)) {
                         NodeUnaryOp *unop_node = static_cast<NodeUnaryOp *>(node);
                         EvalValue val = self.evaluate(unop_node->value);

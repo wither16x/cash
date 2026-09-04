@@ -32,6 +32,9 @@ namespace Cash
                 if (self.expect(TokenType::Var)) {
                         self.advance();
                         return self.parseVarDecl();
+                } else if (self.expect(TokenType::Const)) {
+                        self.advance();
+                        return self.parseConstDecl();
                 }
 
                 self.node_allocator.freeAll();
@@ -53,6 +56,35 @@ namespace Cash
                                 NodeExpr *value = self.parseExpr();
 
                                 NodeVarDecl *node = self.node_allocator.allocateNode<NodeVarDecl>();
+                                node->name = name.value;
+                                node->value = value;
+
+                                return node;
+                        } else {
+                                self.node_allocator.freeAll();
+                                return nullptr;
+                        }
+                }
+
+                self.node_allocator.freeAll();
+                return nullptr;
+        }
+
+        NodeConstDecl *Parser::parseConstDecl(this Parser &self)
+        {
+                if (self.expect(TokenType::Name)) {
+                        Token name = self.advance();
+
+                        if (self.token_cursor >= self.tokens.length()) {
+                                self.node_allocator.freeAll();
+                                return nullptr;
+                        }
+
+                        if (self.expect(TokenType::Equal)) {
+                                self.advance();
+                                NodeExpr *value = self.parseExpr();
+
+                                NodeConstDecl *node = self.node_allocator.allocateNode<NodeConstDecl>();
                                 node->name = name.value;
                                 node->value = value;
 
@@ -151,7 +183,7 @@ namespace Cash
                                 return nullptr;
                         }
 
-                        ++self.token_cursor;
+                        self.advance();
 
                         return inner;
                 }
@@ -250,7 +282,7 @@ namespace Cash
 
                         if (self.expect(TokenType::Equal)) {
                                 self.advance();
-                                
+
                                 NodeExpr *value = self.parseExpr();
                                 if (value) {
                                         NodeAssign *node = self.node_allocator.allocateNode<NodeAssign>();

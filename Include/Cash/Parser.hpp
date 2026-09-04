@@ -23,6 +23,7 @@ namespace Cash
                 void parse(this Parser &self);
                 NodeDecl *parseDecl(this Parser &self);
                 NodeVarDecl *parseVarDecl(this Parser &self);
+                NodeConstDecl *parseConstDecl(this Parser &self);
                 NodeExpr *parseExpr(this Parser &self);
                 NodeExpr *parseTerm(this Parser &self);
                 NodeExpr *parsePrimaryExpr(this Parser &self);
