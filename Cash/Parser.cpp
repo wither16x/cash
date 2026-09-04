@@ -24,7 +24,7 @@ namespace Cash
         NodeDecl *Parser::parseDecl(this Parser &self)
         {
                 if (self.token_cursor >= self.tokens.length()) {
-                        syntaxError(self.tokens[self.token_cursor - 1].value, self.tokens[self.token_cursor - 1].position);
+                        syntaxError(self.precedentToken().value, self.precedentToken().position);
                         self.node_allocator.freeAll();
                         return nullptr;
                 }
@@ -78,7 +78,7 @@ namespace Cash
 
                 while (self.token_cursor < self.tokens.length()) {
                         TokenType op = self.currentToken().type;
-                        if (op != TokenType::Plus and op != TokenType::Minus)
+                        if (not self.expect(TokenType::Plus) and not self.expect(TokenType::Minus))
                                 break;
 
                         ++self.token_cursor;
@@ -110,7 +110,7 @@ namespace Cash
 
                 while (self.token_cursor < self.tokens.length()) {
                         TokenType op = self.currentToken().type;
-                        if (op != TokenType::Star and op != TokenType::Slash)
+                        if (not self.expect(TokenType::Star) and not self.expect(TokenType::Slash))
                                 break;
 
                         ++self.token_cursor;
@@ -135,13 +135,12 @@ namespace Cash
         NodeExpr *Parser::parsePrimaryExpr(this Parser &self)
         {
                 if (self.token_cursor >= self.tokens.length()) {
-                        syntaxError(self.tokens[self.token_cursor - 1].value, self.tokens[self.token_cursor - 1].position);
+                        syntaxError(self.precedentToken().value, self.precedentToken().position);
                         self.node_allocator.freeAll();
                         return nullptr;
                 }
 
-                Token tok = self.currentToken();
-                if (tok.type == TokenType::Plus or tok.type == TokenType::Minus)
+                if (self.expect(TokenType::Plus) or self.expect(TokenType::Minus))
                         return self.parseUnaryOp();
 
                 if (self.expect(TokenType::LeftParenthesis)) {
@@ -149,8 +148,8 @@ namespace Cash
 
                         NodeExpr *inner = self.parseExpr();
 
-                        if (self.token_cursor >= self.tokens.length() or self.tokens[self.token_cursor].type != TokenType::RightParenthesis) {
-                                syntaxError(self.tokens[self.token_cursor - 1].value, self.tokens[self.token_cursor - 1].position);
+                        if (self.token_cursor >= self.tokens.length() or not self.expect(TokenType::RightParenthesis)) {
+                                syntaxError(self.precedentToken().value, self.precedentToken().position);
                                 self.node_allocator.freeAll();
                                 return nullptr;
                         }
@@ -174,8 +173,7 @@ namespace Cash
                         return nullptr;
                 }
 
-                Token tok = self.currentToken();
-                if (tok.type != TokenType::Plus and tok.type != TokenType::Minus) {
+                if (not self.expect(TokenType::Plus) and not self.expect(TokenType::Minus)) {
                         self.node_allocator.freeAll();
                         return nullptr;
                 }
@@ -190,7 +188,7 @@ namespace Cash
 
                 NodeUnaryOp *node = self.node_allocator.allocateNode<NodeUnaryOp>();
                 node->value = value;
-                node->op = tok.type;
+                node->op = self.precedentToken().type;
 
                 return node;
         }
