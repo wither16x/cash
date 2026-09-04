@@ -33,7 +33,18 @@ namespace Cash
 
                 void reset(this Parser &self);
                 void setTokens(this Parser &self, const tokens_t &new_tokens);
+                bool expect(this const Parser &self, TokenType token);
         
                 const ast_t &getNodes(this const Parser &self);
+
+                inline const Token &currentToken(this const Parser &self)
+                {
+                        return self.tokens[self.token_cursor];
+                }
+
+                inline const Token &precedentToken(this const Parser &self)
+                {
+                        return self.tokens[self.token_cursor - 1];
+                }
         };
 } // namespace Cash

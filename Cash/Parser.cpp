@@ -29,8 +29,7 @@ namespace Cash
                         return nullptr;
                 }
 
-                Token modifier = self.tokens[self.token_cursor];
-                if (modifier.type == TokenType::Var) {
+                if (self.expect(TokenType::Var)) {
                         ++self.token_cursor;
                         return self.parseVarDecl();
                 }
@@ -41,8 +40,8 @@ namespace Cash
 
         NodeVarDecl *Parser::parseVarDecl(this Parser &self)
         {
-                Token name = self.tokens[self.token_cursor];
-                if (name.type == TokenType::Name) {
+                Token name = self.currentToken();
+                if (self.expect(TokenType::Name)) {
                         ++self.token_cursor;
 
                         if (self.token_cursor >= self.tokens.length()) {
@@ -50,8 +49,7 @@ namespace Cash
                                 return nullptr;
                         }
 
-                        Token op = self.tokens[self.token_cursor];
-                        if (op.type == TokenType::Equal) {
+                        if (self.expect(TokenType::Equal)) {
                                 ++self.token_cursor;
                                 NodeExpr *value = self.parseExpr();
 
@@ -79,7 +77,7 @@ namespace Cash
                 }
 
                 while (self.token_cursor < self.tokens.length()) {
-                        TokenType op = self.tokens[self.token_cursor].type;
+                        TokenType op = self.currentToken().type;
                         if (op != TokenType::Plus and op != TokenType::Minus)
                                 break;
 
@@ -111,7 +109,7 @@ namespace Cash
                 }
 
                 while (self.token_cursor < self.tokens.length()) {
-                        TokenType op = self.tokens[self.token_cursor].type;
+                        TokenType op = self.currentToken().type;
                         if (op != TokenType::Star and op != TokenType::Slash)
                                 break;
 
@@ -142,11 +140,11 @@ namespace Cash
                         return nullptr;
                 }
 
-                Token tok = self.tokens[self.token_cursor];
+                Token tok = self.currentToken();
                 if (tok.type == TokenType::Plus or tok.type == TokenType::Minus)
                         return self.parseUnaryOp();
 
-                if (tok.type == TokenType::LeftParenthesis) {
+                if (self.expect(TokenType::LeftParenthesis)) {
                         ++self.token_cursor;
 
                         NodeExpr *inner = self.parseExpr();
@@ -176,7 +174,7 @@ namespace Cash
                         return nullptr;
                 }
 
-                Token tok = self.tokens[self.token_cursor];
+                Token tok = self.currentToken();
                 if (tok.type != TokenType::Plus and tok.type != TokenType::Minus) {
                         self.node_allocator.freeAll();
                         return nullptr;
@@ -204,12 +202,11 @@ namespace Cash
                         return nullptr;
                 }
 
-                Token tok = self.tokens[self.token_cursor];
-                if (tok.type == TokenType::Integer) {
+                if (self.expect(TokenType::Integer)) {
                         ++self.token_cursor;
 
                         NodeInteger *node = self.node_allocator.allocateNode<NodeInteger>();
-                        node->value = tok.value;
+                        node->value = self.precedentToken().value;
 
                         return node;
                 }
@@ -225,12 +222,11 @@ namespace Cash
                         return nullptr;
                 }
 
-                Token tok = self.tokens[self.token_cursor];
-                if (tok.type == TokenType::Name) {
+                if (self.expect(TokenType::Name)) {
                         ++self.token_cursor;
 
                         NodeName *node = self.node_allocator.allocateNode<NodeName>();
-                        node->name = tok.value;
+                        node->name = self.precedentToken().value;
 
                         return node;
                 }
@@ -248,8 +244,8 @@ namespace Cash
                         return nullptr;
                 }
 
-                Token name = self.tokens[self.token_cursor];
-                if (name.type == TokenType::Name) {
+                Token name = self.currentToken();
+                if (self.expect(TokenType::Name)) {
                         ++self.token_cursor;
 
                         if (self.token_cursor >= self.tokens.length()) {
@@ -258,8 +254,7 @@ namespace Cash
                                 return nullptr;
                         }
 
-                        Token op = self.tokens[self.token_cursor];
-                        if (op.type == TokenType::Equal) {
+                        if (self.expect(TokenType::Equal)) {
                                 ++self.token_cursor;
 
                                 NodeExpr *value = self.parseExpr();
@@ -289,6 +284,13 @@ namespace Cash
         void Parser::setTokens(this Parser &self, const tokens_t &new_tokens)
         {
                 self.tokens = new_tokens;
+        }
+
+        bool Parser::expect(this const Parser &self, TokenType token)
+        {
+                if (self.token_cursor >= self.tokens.length())
+                        return false;
+                return self.currentToken().type == token;
         }
 
         const ast_t &Parser::getNodes(this const Parser &self)
