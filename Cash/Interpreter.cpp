@@ -87,7 +87,7 @@ namespace Cash
                         return value;
                 } else if (isNodeType<NodeInteger>(node)) {
                         NodeInteger *int_node = static_cast<NodeInteger *>(node);
-                        
+
                         EvalValue value = {
                                 Conversion::stringToInt<int>(int_node->value)
                         };
@@ -100,6 +100,15 @@ namespace Cash
 
                         EvalValue value = symbol.value;
                         return value;
+                } else if (isNodeType<NodeAssign>(node)) {
+                        NodeAssign *assign_node = static_cast<NodeAssign *>(node);
+                        EvalValue value = self.evaluate(assign_node->value);
+
+                        if (not self.symbol_table.getSymbol(assign_node->name).isDefined())
+                                return null_value;
+
+                        self.symbol_table.setSymbolValue(assign_node->name, value);
+                        return self.symbol_table.getSymbol(assign_node->name).value;
                 }
 
                 return null_value;

@@ -15,10 +15,10 @@ namespace Cash
         {
                 self.reset();
 
-                if (NodeExpr *expr = self.parseExpr())
-                        self.nodes.pushBack(expr);
-                else if (NodeDecl *decl = self.parseDecl())
+                if (NodeDecl *decl = self.parseDecl())
                         self.nodes.pushBack(decl);
+                else if (NodeExpr *expr = self.parseExpr())
+                        self.nodes.pushBack(expr);
         }
 
         NodeDecl *Parser::parseDecl(this Parser &self)
@@ -44,6 +44,12 @@ namespace Cash
                 Token name = self.tokens[self.token_cursor];
                 if (name.type == TokenType::Name) {
                         ++self.token_cursor;
+
+                        if (self.token_cursor >= self.tokens.length()) {
+                                self.node_allocator.freeAll();
+                                return nullptr;
+                        }
+
                         Token op = self.tokens[self.token_cursor];
                         if (op.type == TokenType::Equal) {
                                 ++self.token_cursor;
@@ -158,6 +164,8 @@ namespace Cash
 
                 if (NodeInteger *int_node = self.parseInteger())
                         return int_node;
+                else if (NodeAssign *assign_node = self.parseAssign())
+                        return assign_node;
                 return self.parseName();
         }
 
@@ -227,6 +235,45 @@ namespace Cash
                         return node;
                 }
 
+                self.node_allocator.freeAll();
+                return nullptr;
+        }
+
+        NodeAssign *Parser::parseAssign(this Parser &self)
+        {
+                Typing::USize start_cursor = self.token_cursor;
+
+                if (self.token_cursor >= self.tokens.length()) {
+                        self.node_allocator.freeAll();
+                        return nullptr;
+                }
+
+                Token name = self.tokens[self.token_cursor];
+                if (name.type == TokenType::Name) {
+                        ++self.token_cursor;
+
+                        if (self.token_cursor >= self.tokens.length()) {
+                                self.token_cursor = start_cursor;
+                                self.node_allocator.freeAll();
+                                return nullptr;
+                        }
+
+                        Token op = self.tokens[self.token_cursor];
+                        if (op.type == TokenType::Equal) {
+                                ++self.token_cursor;
+
+                                NodeExpr *value = self.parseExpr();
+                                if (value) {
+                                        NodeAssign *node = self.node_allocator.allocateNode<NodeAssign>();
+                                        node->name = name.value;
+                                        node->value = value;
+
+                                        return node;
+                                }
+                        }
+                }
+
+                self.token_cursor = start_cursor;
                 self.node_allocator.freeAll();
                 return nullptr;
         }

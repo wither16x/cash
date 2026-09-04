@@ -29,6 +29,7 @@ namespace Cash
                 NodeUnaryOp *parseUnaryOp(this Parser &self);
                 NodeInteger *parseInteger(this Parser &self);
                 NodeName *parseName(this Parser &self);
+                NodeAssign *parseAssign(this Parser &self);
 
                 void reset(this Parser &self);
                 void setTokens(this Parser &self, const tokens_t &new_tokens);

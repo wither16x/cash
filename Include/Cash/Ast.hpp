@@ -101,6 +101,19 @@ namespace Cash
                 }
         };
 
+        struct NodeAssign : NodeExpr
+        {
+                Melon::String::String name;
+                NodeExpr *value;
+
+                inline Melon::String::String info() const override
+                {
+                        return Melon::Fmt::formatString("NodeAssign(name={}, value={})",
+                                this->name, this->value->info()
+                        );
+                }
+        };
+
         template<typename T>
         inline constexpr bool isNodeType(Node *const &node)
         {

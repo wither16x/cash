@@ -7,7 +7,7 @@ using namespace Melon;
 
 namespace Cash
 {
-        Symbol::Symbol(const String::String &name, const EvalValue &value, SymbolType type)
+        Symbol::Symbol(const String::String &name, EvalValue value, SymbolType type)
                 : name(name), value(value), type(type)
         {}
 
@@ -48,7 +48,7 @@ namespace Cash
         {
                 Typing::USize i = 0;
                 while (self.symbols[i].name != "__undefined__")
-                        self.symbols.popBack();
+                        self.symbols.erase(i);
         }
 
         bool SymbolTable::hasSymbol(this const SymbolTable &self, const String::String &name)
@@ -68,6 +68,19 @@ namespace Cash
                                 return sym;
                 }
 
+                notDeclaredError(name);
                 return self.symbols[0];
+        }
+
+        void SymbolTable::setSymbolValue(this SymbolTable &self, const String::String &name, EvalValue new_value)
+        {
+                for (auto &sym : self.symbols) {
+                        if (sym.name == name) {
+                                sym.value = new_value;
+                                return;
+                        }
+                }
+
+                notDeclaredError(name);
         }
 } // namespace Cash
