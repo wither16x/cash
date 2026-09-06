@@ -190,6 +190,8 @@ namespace Cash
 
                 if (NodeInteger *int_node = self.parseInteger())
                         return int_node;
+                else if (NodeBool *bool_node = self.parseBool())
+                        return bool_node;
                 else if (NodeAssign *assign_node = self.parseAssign())
                         return assign_node;
                 return self.parseName();
@@ -241,6 +243,26 @@ namespace Cash
                 self.node_allocator.freeAll();
                 return nullptr;
         };
+
+        NodeBool *Parser::parseBool(this Parser &self)
+        {
+                if (self.token_cursor >= self.tokens.length()) {
+                        self.node_allocator.freeAll();
+                        return nullptr;
+                }
+
+                if (self.expect(TokenType::True) or self.expect(TokenType::False)) {
+                        self.advance();
+
+                        NodeBool *node = self.node_allocator.allocateNode<NodeBool>();
+                        node->value = self.precedentToken().value;
+
+                        return node;
+                }
+
+                self.node_allocator.freeAll();
+                return nullptr;
+        }
 
         NodeName *Parser::parseName(this Parser &self)
         {

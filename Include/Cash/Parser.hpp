@@ -29,6 +29,7 @@ namespace Cash
                 NodeExpr *parsePrimaryExpr(this Parser &self);
                 NodeUnaryOp *parseUnaryOp(this Parser &self);
                 NodeInteger *parseInteger(this Parser &self);
+                NodeBool *parseBool(this Parser &self);
                 NodeName *parseName(this Parser &self);
                 NodeAssign *parseAssign(this Parser &self);
 

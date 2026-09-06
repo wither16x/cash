@@ -6,9 +6,10 @@
 
 namespace Cash
 {
-        class EvalValue {
+        class EvalValue
+        {
                 template<class... Ts>
-                struct overloaded : Ts...
+                struct Overloaded : Ts...
                 {
                         using Ts::operator()...;
                 };
@@ -17,7 +18,8 @@ namespace Cash
                 std::variant<
                         std::monostate,
                         Melon::String::String,
-                        int
+                        int,
+                        bool
                 > value;
         
                 Melon::String::String toString(this const EvalValue &self);

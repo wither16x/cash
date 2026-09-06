@@ -24,6 +24,8 @@ namespace Cash
 
                 Var,
                 Const,
+                True,
+                False,
 
                 EndOfFile
         };
@@ -41,6 +43,8 @@ namespace Cash
 
                 constexpr char Var[]            = "var";
                 constexpr char Const[]          = "const";
+                constexpr char True[]           = "true";
+                constexpr char False[]          = "false";
         } // namespace TokenValues
 
         struct Token

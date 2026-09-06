@@ -19,6 +19,9 @@ namespace Cash
                         "LeftParenthesis",
                         "RightParenthesis",
                         "Var",
+                        "Const",
+                        "True",
+                        "False",
                         "EndOfFile"
                 };
         } // anonymous namespace

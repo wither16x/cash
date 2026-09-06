@@ -122,6 +122,12 @@ namespace Cash
 
                         self.symbol_table.setSymbolValue(assign_node->name, value);
                         return self.symbol_table.getSymbol(assign_node->name).value;
+                } else if (isNodeType<NodeBool>(node)) {
+                        NodeBool *bool_node = static_cast<NodeBool *>(node);
+                        EvalValue value = {
+                                bool_node->value == "true" ? true : false
+                        };
+                        return value;
                 }
 
                 return null_value;
