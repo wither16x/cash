@@ -16,14 +16,19 @@ namespace Cash
                 Melon::String::String curr_integer;
                 Melon::String::String curr_name;
                 Melon::String::String data;
+                bool lexing;
+                bool has_error;
 
         public:
                 Lexer(const Melon::String::String &data = "");
 
-                void lex(this Lexer &self);
+                bool lex(this Lexer &self);
                 void reset(this Lexer &self);
                 void advance(this Lexer &self);
                 void setData(this Lexer &self, const Melon::String::String &new_data);
+                void addToken(this Lexer &self, TokenType type, const Melon::String::String &value);
+                bool handleToken(this Lexer &self, char expected, TokenType type, const Melon::String::String &value);
+                void error(this Lexer &self);
 
                 bool foundBlank(this const Lexer &self);
                 bool foundDigit(this const Lexer &self);

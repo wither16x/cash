@@ -14,11 +14,12 @@ namespace Cash
                 : data(data)
         {}
 
-        void Lexer::lex(this Lexer &self)
+        bool Lexer::lex(this Lexer &self)
         {
                 self.reset();
+                self.lexing = true;
 
-                while (self.cursor < self.data.length()) {
+                while (self.cursor < self.data.length() and self.lexing) {
                         // skip whitespaces, tabs and newlines
                         while (self.cursor < self.data.length() and self.foundBlank())
                                 self.advance();
@@ -30,7 +31,7 @@ namespace Cash
                         // handle integers
                         if (self.foundDigit()) {
                                 self.curr_integer = "";
-                                while (self.cursor < self.data.length() and self.foundDigit()) {
+                                while (self.cursor < self.data.length() and self.lexing and self.foundDigit()) {
                                         self.curr_integer.appendChar(self.data[self.cursor]);
                                         self.advance();
                                 }
@@ -42,7 +43,7 @@ namespace Cash
                         // names start with a character or a _
                         if (isalpha(self.data[self.cursor]) or self.data[self.cursor] == '_') {
                                 self.curr_name = "";
-                                while (self.cursor < self.data.length() and (isalnum(self.data[self.cursor]) or self.data[self.cursor] == '_')) {
+                                while (self.cursor < self.data.length() and self.lexing and (isalnum(self.data[self.cursor]) or self.data[self.cursor] == '_')) {
                                         self.curr_name.appendChar(self.data[self.cursor]);
                                         self.advance();
                                 }
@@ -57,55 +58,24 @@ namespace Cash
                                 continue;
                         }
 
-                        switch (self.data[self.cursor]) {
-                        case TokenValues::Plus:
-                                self.tokens.emplaceBack(self.position, TokenType::Plus, "+");
-                                self.advance();
-                                break;
+                        bool match =
+                        self.handleToken(TokenValues::Plus, TokenType::Plus, "+")
+                        or self.handleToken(TokenValues::Minus, TokenType::Minus, "-")
+                        or self.handleToken(TokenValues::Star, TokenType::Star, "*")
+                        or self.handleToken(TokenValues::Slash, TokenType::Slash, "/")
+                        or self.handleToken(TokenValues::LeftParenthesis, TokenType::LeftParenthesis, "(")
+                        or self.handleToken(TokenValues::RightParenthesis, TokenType::RightParenthesis, ")")
+                        or self.handleToken(TokenValues::Equal, TokenType::Equal, "=")
+                        or self.handleToken(FileSystem::EndOfFile, TokenType::EndOfFile, "EOF")
+                        ;
 
-                        case TokenValues::Minus:
-                                self.tokens.emplaceBack(self.position, TokenType::Minus, "-");
-                                self.advance();
-                                break;
-
-                        case TokenValues::Star:
-                                self.tokens.emplaceBack(self.position, TokenType::Star, "*");
-                                self.advance();
-                                break;
-
-                        case TokenValues::Slash:
-                                self.tokens.emplaceBack(self.position, TokenType::Slash, "/");
-                                self.advance();
-                                break;
-
-                        case TokenValues::Equal:
-                                self.tokens.emplaceBack(self.position, TokenType::Equal, "=");
-                                self.advance();
-                                break;
-
-                        case TokenValues::LeftParenthesis:
-                                self.tokens.emplaceBack(self.position, TokenType::LeftParenthesis, "(");
-                                self.advance();
-                                break;
-
-                        case TokenValues::RightParenthesis:
-                                self.tokens.emplaceBack(self.position, TokenType::RightParenthesis, ")");
-                                self.advance();
-                                break;
-
-                        case FileSystem::EndOfFile:
-                                self.tokens.emplaceBack(self.position, TokenType::EndOfFile, "EOF");
-                                break;
-
-                        case '\0':
-                                break;
-
-                        default:
-                                illegalCharacterError(self.data[self.cursor], self.position);
-                                self.advance();
-                                break;
-                        }
+                        if (not match)
+                                self.error();
                 }
+
+                if (self.has_error)
+                        return false;
+                return true;
         }
 
         void Lexer::reset(this Lexer &self)
@@ -113,6 +83,7 @@ namespace Cash
                 self.tokens.clear();
                 self.cursor = 0;
                 self.position = {0, 0};
+                self.has_error = false;
         }
 
         void Lexer::advance(this Lexer &self)
@@ -130,6 +101,28 @@ namespace Cash
         void Lexer::setData(this Lexer &self, const String::String &new_data)
         {
                 self.data = new_data;
+        }
+
+        void Lexer::addToken(this Lexer &self, TokenType type, const String::String &value)
+        {
+                self.tokens.emplaceBack(self.position, type, value);
+        }
+
+        bool Lexer::handleToken(this Lexer &self, char expected, TokenType type, const Melon::String::String &value)
+        {
+                if (self.data[self.cursor] != expected)
+                        return false;
+
+                self.addToken(type, value);
+                self.advance();
+                return true;
+        }
+
+        void Lexer::error(this Lexer &self)
+        {
+                illegalCharacterError(self.data[self.cursor], self.position);
+                self.lexing = false;
+                self.has_error = true;
         }
 
         bool Lexer::foundBlank(this const Lexer &self)

@@ -22,7 +22,8 @@ namespace Cash
                 while (running) {
                         String::String command = Input::input("cash> ");
                         lexer.setData(command);
-                        lexer.lex();
+                        if (not lexer.lex())
+                                continue;
                         
                         tokens_t tokens = lexer.getTokens();
                         parser.setTokens(tokens);
