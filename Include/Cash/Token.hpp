@@ -18,6 +18,10 @@ namespace Cash
                 Star,
                 Slash,
                 Equal,
+                And,
+                Or,
+                Xor,
+                Not,
 
                 LeftParenthesis,
                 RightParenthesis,
@@ -37,6 +41,10 @@ namespace Cash
                 constexpr char Star             = '*';
                 constexpr char Slash            = '/';
                 constexpr char Equal            = '=';
+                constexpr char And[]            = "and";
+                constexpr char Or[]             = "or";
+                constexpr char Xor[]            = "xor";
+                constexpr char Not[]            = "not";
 
                 constexpr char LeftParenthesis  = '(';
                 constexpr char RightParenthesis = ')';

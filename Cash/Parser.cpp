@@ -108,7 +108,10 @@ namespace Cash
                 }
 
                 while (self.token_cursor < self.tokens.length()) {
-                        if (not self.expect(TokenType::Plus) and not self.expect(TokenType::Minus))
+                        if (not self.expect(TokenType::Plus)
+                        and not self.expect(TokenType::Minus)
+                        and not self.expect(TokenType::Or)
+                        and not self.expect(TokenType::Xor))
                                 break;
 
                         Token op = self.advance();
@@ -139,7 +142,9 @@ namespace Cash
                 }
 
                 while (self.token_cursor < self.tokens.length()) {
-                        if (not self.expect(TokenType::Star) and not self.expect(TokenType::Slash))
+                        if (not self.expect(TokenType::Star)
+                        and not self.expect(TokenType::Slash)
+                        and not self.expect(TokenType::And))
                                 break;
 
                         Token op = self.advance();
@@ -169,7 +174,9 @@ namespace Cash
                         return nullptr;
                 }
 
-                if (self.expect(TokenType::Plus) or self.expect(TokenType::Minus))
+                if (self.expect(TokenType::Plus)
+                or self.expect(TokenType::Minus)
+                or self.expect(TokenType::Not))
                         return self.parseUnaryOp();
 
                 if (self.expect(TokenType::LeftParenthesis)) {
@@ -204,12 +211,7 @@ namespace Cash
                         return nullptr;
                 }
 
-                if (not self.expect(TokenType::Plus) and not self.expect(TokenType::Minus)) {
-                        self.node_allocator.freeAll();
-                        return nullptr;
-                }
-
-                self.advance();
+                Token op = self.advance();
 
                 NodeExpr *value = self.parsePrimaryExpr();
                 if (not value) {
@@ -219,7 +221,7 @@ namespace Cash
 
                 NodeUnaryOp *node = self.node_allocator.allocateNode<NodeUnaryOp>();
                 node->value = value;
-                node->op = self.precedentToken().type;
+                node->op = op.type;
 
                 return node;
         }

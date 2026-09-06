@@ -60,6 +60,14 @@ namespace Cash
                         EvalValue val = self.evaluate(unop_node->value);
 
                         int int_val = val.toInt();
+
+                        if (unop_node->op == TokenType::Not) {
+                                bool result = not int_val;
+                                EvalValue value = {
+                                        result
+                                };
+                                return value;
+                        }
                         
                         int result;
                         if (unop_node->op == TokenType::Plus)
@@ -75,9 +83,27 @@ namespace Cash
                         NodeBinaryOp *binop_node = static_cast<NodeBinaryOp *>(node);
                         EvalValue left = self.evaluate(binop_node->left);
                         EvalValue right = self.evaluate(binop_node->right);
-
+                        
                         int left_val = left.toInt();
                         int right_val = right.toInt();
+
+                        if (binop_node->op == TokenType::And
+                        or binop_node->op == TokenType::Or
+                        or binop_node->op == TokenType::Xor) {
+                                bool result;
+
+                                if (binop_node->op == TokenType::And)
+                                        result = left_val and right_val;
+                                else if (binop_node->op == TokenType::Or)
+                                        result = left_val or right_val;
+                                else
+                                        result = left_val xor right_val;
+
+                                EvalValue value = {
+                                        result
+                                };
+                                return value;
+                        }
 
                         int result;
                         if (binop_node->op == TokenType::Plus) {

@@ -56,6 +56,14 @@ namespace Cash
                                         self.tokens.emplaceBack(start, TokenType::True, self.curr_name);
                                 } else if (self.curr_name == TokenValues::False) {
                                         self.tokens.emplaceBack(start, TokenType::False, self.curr_name);
+                                } else if (self.curr_name == TokenValues::And) {
+                                        self.tokens.emplaceBack(start, TokenType::And, self.curr_name);
+                                } else if (self.curr_name == TokenValues::Or) {
+                                        self.tokens.emplaceBack(start, TokenType::Or, self.curr_name);
+                                } else if (self.curr_name == TokenValues::Xor) {
+                                        self.tokens.emplaceBack(start, TokenType::Xor, self.curr_name);
+                                } else if (self.curr_name == TokenValues::Not) {
+                                        self.tokens.emplaceBack(start, TokenType::Not, self.curr_name);
                                 } else {
                                         self.tokens.emplaceBack(start, TokenType::Name, self.curr_name);
                                 }
