@@ -48,21 +48,21 @@ namespace Cash
                                         self.advance();
                                 }
 
-                                if (self.curr_name == TokenValues::Var) {
+                                if (self.curr_name == "var") {
                                         self.tokens.emplaceBack(start, TokenType::Var, self.curr_name);
-                                } else if (self.curr_name == TokenValues::Const) {
+                                } else if (self.curr_name == "const") {
                                         self.tokens.emplaceBack(start, TokenType::Const, self.curr_name);
-                                } else if (self.curr_name == TokenValues::True) {
+                                } else if (self.curr_name == "true") {
                                         self.tokens.emplaceBack(start, TokenType::True, self.curr_name);
-                                } else if (self.curr_name == TokenValues::False) {
+                                } else if (self.curr_name == "false") {
                                         self.tokens.emplaceBack(start, TokenType::False, self.curr_name);
-                                } else if (self.curr_name == TokenValues::And) {
+                                } else if (self.curr_name == "and") {
                                         self.tokens.emplaceBack(start, TokenType::And, self.curr_name);
-                                } else if (self.curr_name == TokenValues::Or) {
+                                } else if (self.curr_name == "or") {
                                         self.tokens.emplaceBack(start, TokenType::Or, self.curr_name);
-                                } else if (self.curr_name == TokenValues::Xor) {
+                                } else if (self.curr_name == "xor") {
                                         self.tokens.emplaceBack(start, TokenType::Xor, self.curr_name);
-                                } else if (self.curr_name == TokenValues::Not) {
+                                } else if (self.curr_name == "not") {
                                         self.tokens.emplaceBack(start, TokenType::Not, self.curr_name);
                                 } else {
                                         self.tokens.emplaceBack(start, TokenType::Name, self.curr_name);
@@ -70,19 +70,83 @@ namespace Cash
                                 continue;
                         }
 
-                        bool match =
-                        self.handleToken(TokenValues::Plus, TokenType::Plus, "+")
-                        or self.handleToken(TokenValues::Minus, TokenType::Minus, "-")
-                        or self.handleToken(TokenValues::Star, TokenType::Star, "*")
-                        or self.handleToken(TokenValues::Slash, TokenType::Slash, "/")
-                        or self.handleToken(TokenValues::LeftParenthesis, TokenType::LeftParenthesis, "(")
-                        or self.handleToken(TokenValues::RightParenthesis, TokenType::RightParenthesis, ")")
-                        or self.handleToken(TokenValues::Equal, TokenType::Equal, "=")
-                        or self.handleToken(FileSystem::EndOfFile, TokenType::EndOfFile, "EOF")
-                        ;
+                        switch (self.data[self.cursor]) {
+                        case '+':
+                                self.addToken(TokenType::Plus, "+");
+                                self.advance();
+                                break;
 
-                        if (not match)
+                        case '-':
+                                self.addToken(TokenType::Minus, "-");
+                                self.advance();
+                                break;
+
+                        case '*':
+                                self.addToken(TokenType::Star, "*");
+                                self.advance();
+                                break;
+
+                        case '/':
+                                self.addToken(TokenType::Slash, "/");
+                                self.advance();
+                                break;
+
+                        case '(':
+                                self.addToken(TokenType::LeftParenthesis, "(");
+                                self.advance();
+                                break;
+
+                        case ')':
+                                self.addToken(TokenType::RightParenthesis, ")");
+                                self.advance();
+                                break;
+
+                        case '=':
+                                self.advance();
+                                if (self.data[self.cursor] == '=')
+                                        self.addToken(TokenType::EqualEqual, "==");
+                                else
+                                        self.addToken(TokenType::Equal, "=");
+                                self.advance();
+                                break;
+
+                        case '!':
+                                self.advance();
+                                if (self.data[self.cursor] == '=') {
+                                        self.addToken(TokenType::NotEqual, "!=");
+                                        self.advance();
+                                } else {
+                                        self.error();
+                                }
+                                break;
+
+                        case '<':
+                                self.advance();
+                                if (self.data[self.cursor] == '=')
+                                        self.addToken(TokenType::LesserThanEqual, "<=");
+                                else
+                                        self.addToken(TokenType::LesserThan, "<");
+                                self.advance();
+                                break;
+
+                        case '>':
+                                self.advance();
+                                if (self.data[self.cursor] == '=')
+                                        self.addToken(TokenType::GreaterThanEqual, ">=");
+                                else
+                                        self.addToken(TokenType::GreaterThan, ">");
+                                self.advance();
+                                break;
+
+                        case FileSystem::EndOfFile:
+                                self.addToken(TokenType::EndOfFile, "EOF");
+                                self.advance();
+                                break;
+
+                        default:
                                 self.error();
+                                break;
+                        }
                 }
 
                 if (self.has_error)
@@ -118,16 +182,6 @@ namespace Cash
         void Lexer::addToken(this Lexer &self, TokenType type, const String::String &value)
         {
                 self.tokens.emplaceBack(self.position, type, value);
-        }
-
-        bool Lexer::handleToken(this Lexer &self, char expected, TokenType type, const Melon::String::String &value)
-        {
-                if (self.data[self.cursor] != expected)
-                        return false;
-
-                self.addToken(type, value);
-                self.advance();
-                return true;
         }
 
         void Lexer::error(this Lexer &self)

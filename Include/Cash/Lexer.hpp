@@ -27,7 +27,6 @@ namespace Cash
                 void advance(this Lexer &self);
                 void setData(this Lexer &self, const Melon::String::String &new_data);
                 void addToken(this Lexer &self, TokenType type, const Melon::String::String &value);
-                bool handleToken(this Lexer &self, char expected, TokenType type, const Melon::String::String &value);
                 void error(this Lexer &self);
 
                 bool foundBlank(this const Lexer &self);

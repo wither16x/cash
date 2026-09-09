@@ -22,6 +22,12 @@ namespace Cash
                 Or,
                 Xor,
                 Not,
+                EqualEqual,
+                NotEqual,
+                LesserThan,
+                GreaterThan,
+                LesserThanEqual,
+                GreaterThanEqual,
 
                 LeftParenthesis,
                 RightParenthesis,
@@ -33,27 +39,6 @@ namespace Cash
 
                 EndOfFile
         };
-
-        namespace TokenValues
-        {
-                constexpr char Plus             = '+';
-                constexpr char Minus            = '-';
-                constexpr char Star             = '*';
-                constexpr char Slash            = '/';
-                constexpr char Equal            = '=';
-                constexpr char And[]            = "and";
-                constexpr char Or[]             = "or";
-                constexpr char Xor[]            = "xor";
-                constexpr char Not[]            = "not";
-
-                constexpr char LeftParenthesis  = '(';
-                constexpr char RightParenthesis = ')';
-
-                constexpr char Var[]            = "var";
-                constexpr char Const[]          = "const";
-                constexpr char True[]           = "true";
-                constexpr char False[]          = "false";
-        } // namespace TokenValues
 
         struct Token
         {
