@@ -208,6 +208,8 @@ namespace Cash
                         return bool_node;
                 else if (NodeAssign *assign_node = self.parseAssign())
                         return assign_node;
+                else if (NodeString *string_node = self.parseString())
+                        return string_node;
                 return self.parseName();
         }
 
@@ -285,6 +287,26 @@ namespace Cash
 
                         NodeName *node = self.node_allocator.allocateNode<NodeName>();
                         node->name = self.precedentToken().value;
+
+                        return node;
+                }
+
+                self.node_allocator.freeAll();
+                return nullptr;
+        }
+
+        NodeString *Parser::parseString(this Parser &self)
+        {
+                if (self.token_cursor >= self.tokens.length()) {
+                        self.node_allocator.freeAll();
+                        return nullptr;
+                }
+
+                if (self.expect(TokenType::String)) {
+                        self.advance();
+
+                        NodeString *node = self.node_allocator.allocateNode<NodeString>();
+                        node->value = self.precedentToken().value;
 
                         return node;
                 }

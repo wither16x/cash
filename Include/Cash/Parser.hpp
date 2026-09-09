@@ -31,6 +31,7 @@ namespace Cash
                 NodeInteger *parseInteger(this Parser &self);
                 NodeBool *parseBool(this Parser &self);
                 NodeName *parseName(this Parser &self);
+                NodeString *parseString(this Parser &self);
                 NodeAssign *parseAssign(this Parser &self);
 
                 void reset(this Parser &self);

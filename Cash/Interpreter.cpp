@@ -4,6 +4,7 @@
 #include <Cash/Error.hpp>
 
 #include <Melon/Conversion.hpp>
+#include <variant>
 
 using namespace Melon;
 
@@ -38,6 +39,7 @@ namespace Cash
                                 value,
                                 SymbolType::Variable
                         );
+                        
                         self.symbol_table.addSymbol(symbol);
                         return null_value;
                 } else if (isNodeType<NodeConstDecl>(node)) {
@@ -49,6 +51,7 @@ namespace Cash
                                 value,
                                 SymbolType::Constant
                         );
+
                         self.symbol_table.addSymbol(symbol);
                         return null_value;
                 } else if (isNodeType<NodeUnaryOp>(node)) {
@@ -80,6 +83,16 @@ namespace Cash
                         EvalValue left = self.evaluate(binop_node->left);
                         EvalValue right = self.evaluate(binop_node->right);
                         
+                        if (std::holds_alternative<String::String>(left.value)
+                        and std::holds_alternative<String::String>(right.value)) {
+                                if (binop_node->op == TokenType::Plus)
+                                        return {left.toString() + right.toString()};
+                                else if (binop_node->op == TokenType::EqualEqual)
+                                        return {left.toString() == right.toString()};
+                                else if (binop_node->op == TokenType::NotEqual)
+                                        return {left.toString() != right.toString()};
+                        }
+
                         int left_val = left.toInt();
                         int right_val = right.toInt();
 
@@ -166,6 +179,12 @@ namespace Cash
                         NodeBool *bool_node = static_cast<NodeBool *>(node);
                         EvalValue value = {
                                 bool_node->value == "true" ? true : false
+                        };
+                        return value;
+                } else if (isNodeType<NodeString>(node)) {
+                        NodeString *string_node = static_cast<NodeString *>(node);
+                        EvalValue value = {
+                                string_node->value
                         };
                         return value;
                 }

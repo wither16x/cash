@@ -24,6 +24,9 @@ namespace Cash
                         lexer.setData(command);
                         if (not lexer.lex())
                                 continue;
+
+                        // for (auto &tok : lexer.getTokens())
+                        //         Print::println("{}", tok.value);
                         
                         tokens_t tokens = lexer.getTokens();
                         parser.setTokens(tokens);

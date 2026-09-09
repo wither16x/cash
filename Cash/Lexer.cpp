@@ -138,6 +138,17 @@ namespace Cash
                                 self.advance();
                                 break;
 
+                        case '"':
+                                self.advance();
+                                self.curr_string = "";
+                                while (self.data[self.cursor] != '"' and self.cursor < self.data.length()) {
+                                        self.curr_string.appendChar(self.data[self.cursor]);
+                                        self.advance();
+                                }
+                                self.addToken(TokenType::String, self.curr_string);
+                                self.advance();
+                                break;
+
                         case FileSystem::EndOfFile:
                                 self.addToken(TokenType::EndOfFile, "EOF");
                                 self.advance();

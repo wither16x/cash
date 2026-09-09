@@ -126,6 +126,18 @@ namespace Cash
                 }
         };
 
+        struct NodeString : NodeExpr
+        {
+                Melon::String::String value;
+
+                inline Melon::String::String info() const override
+                {
+                        return Melon::Fmt::formatString("NodeString(value={})",
+                                this->value
+                        );
+                }
+        };
+
         struct NodeAssign : NodeExpr
         {
                 Melon::String::String name;

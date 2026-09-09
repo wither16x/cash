@@ -29,4 +29,4 @@ namespace Cash
         inline constexpr EvalValue null_value = {std::monostate()};
 
         using eval_values_t = Melon::Vector::Vector<EvalValue>;
-} // namespace Cahs
+} // namespace Cash

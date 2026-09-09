@@ -15,6 +15,7 @@ namespace Cash
                 Melon::Typing::USize cursor;
                 Melon::String::String curr_integer;
                 Melon::String::String curr_name;
+                Melon::String::String curr_string;
                 Melon::String::String data;
                 bool lexing;
                 bool has_error;

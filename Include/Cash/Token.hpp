@@ -12,6 +12,7 @@ namespace Cash
         {
                 Integer,
                 Name,
+                String,
 
                 Plus,
                 Minus,
