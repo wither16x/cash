@@ -38,10 +38,8 @@ namespace Cash
                                 value,
                                 SymbolType::Variable
                         );
-                        if (not self.symbol_table.addSymbol(symbol))
-                                return null_value;
-                        
-                        return value;
+                        self.symbol_table.addSymbol(symbol);
+                        return null_value;
                 } else if (isNodeType<NodeConstDecl>(node)) {
                         NodeConstDecl *vardecl_node = static_cast<NodeConstDecl *>(node);
                         EvalValue value = self.evaluate(vardecl_node->value);
@@ -51,10 +49,8 @@ namespace Cash
                                 value,
                                 SymbolType::Constant
                         );
-                        if (not self.symbol_table.addSymbol(symbol))
-                                return null_value;
-                        
-                        return value;
+                        self.symbol_table.addSymbol(symbol);
+                        return null_value;
                 } else if (isNodeType<NodeUnaryOp>(node)) {
                         NodeUnaryOp *unop_node = static_cast<NodeUnaryOp *>(node);
                         EvalValue val = self.evaluate(unop_node->value);
@@ -89,15 +85,33 @@ namespace Cash
 
                         if (binop_node->op == TokenType::And
                         or binop_node->op == TokenType::Or
-                        or binop_node->op == TokenType::Xor) {
+                        or binop_node->op == TokenType::Xor
+                        or binop_node->op == TokenType::EqualEqual
+                        or binop_node->op == TokenType::NotEqual
+                        or binop_node->op == TokenType::LesserThan
+                        or binop_node->op == TokenType::LesserThanEqual
+                        or binop_node->op == TokenType::GreaterThan
+                        or binop_node->op == TokenType::GreaterThanEqual) {
                                 bool result;
 
                                 if (binop_node->op == TokenType::And)
                                         result = left_val and right_val;
                                 else if (binop_node->op == TokenType::Or)
                                         result = left_val or right_val;
-                                else
+                                else if (binop_node->op == TokenType::Xor)
                                         result = left_val xor right_val;
+                                else if (binop_node->op == TokenType::EqualEqual)
+                                        result = left_val == right_val;
+                                else if (binop_node->op == TokenType::NotEqual)
+                                        result = left_val != right_val;
+                                else if (binop_node->op == TokenType::LesserThan)
+                                        result = left_val < right_val;
+                                else if (binop_node->op == TokenType::LesserThanEqual)
+                                        result = left_val <= right_val;
+                                else if (binop_node->op == TokenType::GreaterThan)
+                                        result = left_val > right_val;
+                                else if (binop_node->op == TokenType::GreaterThanEqual)
+                                        result = left_val >= right_val;
 
                                 EvalValue value = {
                                         result

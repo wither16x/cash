@@ -111,7 +111,14 @@ namespace Cash
                         if (not self.expect(TokenType::Plus)
                         and not self.expect(TokenType::Minus)
                         and not self.expect(TokenType::Or)
-                        and not self.expect(TokenType::Xor))
+                        and not self.expect(TokenType::Xor)
+                        and not self.expect(TokenType::EqualEqual)
+                        and not self.expect(TokenType::NotEqual)
+                        and not self.expect(TokenType::LesserThan)
+                        and not self.expect(TokenType::LesserThanEqual)
+                        and not self.expect(TokenType::GreaterThan)
+                        and not self.expect(TokenType::GreaterThanEqual)
+                        )
                                 break;
 
                         Token op = self.advance();
