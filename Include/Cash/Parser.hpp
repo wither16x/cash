@@ -33,6 +33,7 @@ namespace Cash
                 NodeName *parseName(this Parser &self);
                 NodeString *parseString(this Parser &self);
                 NodeAssign *parseAssign(this Parser &self);
+                NodeList *parseList(this Parser &self);
 
                 void reset(this Parser &self);
                 void setTokens(this Parser &self, const tokens_t &new_tokens);

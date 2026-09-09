@@ -210,6 +210,8 @@ namespace Cash
                         return assign_node;
                 else if (NodeString *string_node = self.parseString())
                         return string_node;
+                else if (NodeList *list_node = self.parseList())
+                        return list_node;
                 return self.parseName();
         }
 
@@ -282,13 +284,30 @@ namespace Cash
                         return nullptr;
                 }
 
+                Token name = self.currentToken();
+
                 if (self.expect(TokenType::Name)) {
                         self.advance();
 
-                        NodeName *node = self.node_allocator.allocateNode<NodeName>();
-                        node->name = self.precedentToken().value;
+                        if (self.expect(TokenType::LeftSquareBrace)) {
+                                self.advance();
+                                NodeName *node = self.node_allocator.allocateNode<NodeName>();
+                                node->name = name.value;
+                                node->index = self.parseExpr();
 
-                        return node;
+                                if (not self.expect(TokenType::RightSquareBrace)) {
+                                        syntaxError(self.currentToken().value, self.currentToken().position);
+                                        self.node_allocator.freeAll();
+                                        return nullptr;
+                                }
+                                
+                                return node;
+                        } else {
+                                NodeName *node = self.node_allocator.allocateNode<NodeName>();
+                                node->name = name.value;
+                                node->index = nullptr;
+                                return node;
+                        }
                 }
 
                 self.node_allocator.freeAll();
@@ -318,6 +337,7 @@ namespace Cash
         NodeAssign *Parser::parseAssign(this Parser &self)
         {
                 Typing::USize start_cursor = self.token_cursor;
+                NodeExpr *index;
 
                 if (self.token_cursor >= self.tokens.length()) {
                         self.node_allocator.freeAll();
@@ -333,6 +353,19 @@ namespace Cash
                                 return nullptr;
                         }
 
+                        if (self.expect(TokenType::LeftSquareBrace)) {
+                                self.advance();
+                                index = self.parseExpr();
+                                
+                                if (not self.expect(TokenType::RightSquareBrace)) {
+                                        syntaxError(self.currentToken().value, self.currentToken().position);
+                                        self.node_allocator.freeAll();
+                                        return nullptr;
+                                }
+
+                                self.advance();
+                        }
+
                         if (self.expect(TokenType::Equal)) {
                                 self.advance();
 
@@ -340,6 +373,7 @@ namespace Cash
                                 if (value) {
                                         NodeAssign *node = self.node_allocator.allocateNode<NodeAssign>();
                                         node->name = name.value;
+                                        node->index = index;
                                         node->value = value;
 
                                         return node;
@@ -348,6 +382,56 @@ namespace Cash
                 }
 
                 self.token_cursor = start_cursor;
+                self.node_allocator.freeAll();
+                return nullptr;
+        }
+
+        NodeList *Parser::parseList(this Parser &self)
+        {
+                if (self.token_cursor >= self.tokens.length()) {
+                        self.node_allocator.freeAll();
+                        return nullptr;
+                }
+
+                if (self.expect(TokenType::LeftSquareBrace)) {
+                        NodeList *node = self.node_allocator.allocateNode<NodeList>();
+                        self.advance();
+
+                        if (not self.expect(TokenType::RightSquareBrace)) {
+                                while (true) {
+                                        NodeExpr *expr = self.parseExpr();
+                                        if (not expr) {
+                                                self.node_allocator.freeAll();
+                                                return nullptr;
+                                        }
+                                        node->content.pushBack(expr);
+
+                                        if (self.token_cursor >= self.tokens.length()) {
+                                                syntaxError(self.precedentToken().value, self.precedentToken().position);
+                                                self.node_allocator.freeAll();
+                                                return nullptr;
+                                        }
+
+                                        if (self.expect(TokenType::Comma)) {
+                                                self.advance();
+                                                continue;
+                                        }
+
+                                        break;
+                                }
+                        }
+
+                        if (not self.expect(TokenType::RightSquareBrace)) {
+                                syntaxError(self.currentToken().value, self.currentToken().position);
+                                self.node_allocator.freeAll();
+                                return nullptr;
+                        }
+
+                        self.advance();
+
+                        return node;
+                }
+
                 self.node_allocator.freeAll();
                 return nullptr;
         }

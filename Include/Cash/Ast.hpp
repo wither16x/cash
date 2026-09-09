@@ -117,11 +117,12 @@ namespace Cash
         struct NodeName : NodeExpr
         {
                 Melon::String::String name;
+                NodeExpr *index;
 
                 inline Melon::String::String info() const override
                 {
-                        return Melon::Fmt::formatString("NodeName(name={})",
-                                this->name
+                        return Melon::Fmt::formatString("NodeName(name={}, index={})",
+                                this->name, this->index ? this->index->info() : "(nullptr)"
                         );
                 }
         };
@@ -141,13 +142,24 @@ namespace Cash
         struct NodeAssign : NodeExpr
         {
                 Melon::String::String name;
+                NodeExpr *index;
                 NodeExpr *value;
 
                 inline Melon::String::String info() const override
                 {
-                        return Melon::Fmt::formatString("NodeAssign(name={}, value={})",
-                                this->name, this->value->info()
+                        return Melon::Fmt::formatString("NodeAssign(name={}, index={}, value={})",
+                                this->name, this->index ? this->index->info() : "(nullptr)", this->value->info()
                         );
+                }
+        };
+
+        struct NodeList : NodeExpr
+        {
+                Melon::Vector::Vector<NodeExpr *> content;
+
+                inline Melon::String::String info() const override
+                {
+                        return "NodeList()";
                 }
         };
 

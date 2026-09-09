@@ -32,6 +32,9 @@ namespace Cash
 
                 LeftParenthesis,
                 RightParenthesis,
+                LeftSquareBrace,
+                RightSquareBrace,
+                Comma,
 
                 Var,
                 Const,

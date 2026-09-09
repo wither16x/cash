@@ -12,6 +12,7 @@ namespace Cash
         void alreadyDeclaredError(const Melon::String::String &name);
         void notDeclaredError(const Melon::String::String &name);
         void isConstantError(const Melon::String::String &name);
+        void indexOutOfRangeError(Melon::Typing::USize index, Melon::Typing::USize limit);
 
         template<typename T>
         void divisionByZeroError(T x)

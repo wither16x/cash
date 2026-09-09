@@ -149,6 +149,21 @@ namespace Cash
                                 self.advance();
                                 break;
 
+                        case '[':
+                                self.addToken(TokenType::LeftSquareBrace, "[");
+                                self.advance();
+                                break;
+
+                        case ']':
+                                self.addToken(TokenType::RightSquareBrace, "]");
+                                self.advance();
+                                break;
+
+                        case ',':
+                                self.addToken(TokenType::Comma, ",");
+                                self.advance();
+                                break;
+
                         case FileSystem::EndOfFile:
                                 self.addToken(TokenType::EndOfFile, "EOF");
                                 self.advance();

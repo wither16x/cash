@@ -19,11 +19,15 @@ namespace Cash
                         std::monostate,
                         Melon::String::String,
                         int,
-                        bool
+                        bool,
+                        Melon::Vector::Vector<EvalValue>
                 > value;
         
                 Melon::String::String toString(this const EvalValue &self);
                 int toInt(this const EvalValue &self);
+                Melon::Vector::Vector<EvalValue> toVector(this const EvalValue &self);
+
+                bool operator ==(const EvalValue &) const = default;
         };
 
         inline constexpr EvalValue null_value = {std::monostate()};

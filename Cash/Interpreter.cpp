@@ -163,18 +163,44 @@ namespace Cash
                         const Symbol &symbol = self.symbol_table.getSymbol(name_node->name);
                         if (not symbol.isDefined())
                                 return null_value;
-
-                        EvalValue value = symbol.value;
-                        return value;
+                        
+                        if (name_node->index) {
+                                EvalValue index = self.evaluate(name_node->index);
+                                if (index.toInt() < 0 or static_cast<Typing::USize>(index.toInt()) >= symbol.value.toVector().length()) {
+                                        indexOutOfRangeError(index.toInt(), symbol.value.toVector().length());
+                                        return null_value;
+                                }
+                                EvalValue value = symbol.value.toVector()[index.toInt()];
+                                return value;
+                        } else {
+                                EvalValue value = symbol.value;
+                                return value;
+                        }
                 } else if (isNodeType<NodeAssign>(node)) {
                         NodeAssign *assign_node = static_cast<NodeAssign *>(node);
                         EvalValue value = self.evaluate(assign_node->value);
-
-                        if (not self.symbol_table.getSymbol(assign_node->name).isDefined())
+                        const Symbol &symbol = self.symbol_table.getSymbol(assign_node->name);
+                        if (not symbol.isDefined())
                                 return null_value;
 
-                        self.symbol_table.setSymbolValue(assign_node->name, value);
-                        return self.symbol_table.getSymbol(assign_node->name).value;
+                        if (assign_node->index) {
+                                EvalValue index = self.evaluate(assign_node->index);
+                                int idx = index.toInt();
+
+                                Vector::Vector<EvalValue> vec = symbol.value.toVector();
+
+                                if (idx < 0 or static_cast<Typing::USize>(idx) >= vec.length()) {
+                                        indexOutOfRangeError(idx, vec.length());
+                                        return null_value;
+                                }
+
+                                vec[idx] = value;
+                                self.symbol_table.setSymbolValue(assign_node->name, EvalValue{vec});
+                                return self.symbol_table.getSymbol(assign_node->name).value;
+                        } else {
+                                self.symbol_table.setSymbolValue(assign_node->name, value);
+                                return self.symbol_table.getSymbol(assign_node->name).value;
+                        }
                 } else if (isNodeType<NodeBool>(node)) {
                         NodeBool *bool_node = static_cast<NodeBool *>(node);
                         EvalValue value = {
@@ -186,6 +212,18 @@ namespace Cash
                         EvalValue value = {
                                 string_node->value
                         };
+                        return value;
+                } else if (isNodeType<NodeList>(node)) {
+                        NodeList *list_node = static_cast<NodeList *>(node);
+                        
+                        Vector::Vector<EvalValue> eval_values;
+                        for (auto &expr : list_node->content)
+                                eval_values.pushBack(self.evaluate(expr));
+
+                        EvalValue value = {
+                                eval_values
+                        };
+
                         return value;
                 }
 

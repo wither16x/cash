@@ -38,4 +38,11 @@ namespace Cash
                         name
                 );
         }
+
+        void indexOutOfRangeError(Melon::Typing::USize index, Melon::Typing::USize limit)
+        {
+                Print::println("error: index {} out of range, highest index is {}",
+                        index, limit
+                );
+        }
 } // namespace Cash
