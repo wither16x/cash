@@ -10,6 +10,52 @@ using namespace Melon;
 
 namespace Cash
 {
+        bool Lexer::looksLikeCommandStart(this const Lexer &self)
+        {
+                char c = self.data[self.cursor];
+
+                if (Typing::isDigit(c))
+                        return false;
+
+                if (c == '+' or c == '-' or c == '(' or c == '"' or c == '[')
+                        return false;
+
+                if (isalpha(c) or c == '_') {
+                        Typing::USize i = self.cursor;
+                        String::String word;
+
+                        while (i < self.data.length() and (isalnum(self.data[i]) or self.data[i] == '_')) {
+                                word.appendChar(self.data[i]);
+                                ++i;
+                        }
+
+                        if (word == "var" or word == "const"
+                        or word == "true" or word == "false"
+                        or word == "and" or word == "or"
+                        or word == "xor" or word == "not")
+                                return false;
+
+                        Typing::USize j = i;
+                        while (j < self.data.length() and Typing::isSpace(self.data[j]))
+                                ++j;
+
+                        if (j < self.data.length() and self.data[j] == '='  and (j + 1 >= self.data.length() or self.data[j + 1] != '='))
+                                return false;
+
+                        if (j < self.data.length()) {
+                                char next = self.data[j];
+                                if (next == '+' or next == '-' or next == '*' or next == '/'
+                                or next == '=' or next == '!' or next == '<' or next == '>'
+                                or next == '[')
+                                        return false;
+                        }
+
+                        return true;
+                }
+
+                return true;
+        }
+
         Lexer::Lexer(const String::String &data)
                 : data(data)
         {}
@@ -28,6 +74,17 @@ namespace Cash
                                 break;
 
                         Position start = self.position;
+                        if ((self.cursor == 0 or self.data[self.cursor] == '\n') and self.looksLikeCommandStart()) {
+                                self.curr_string = "";
+                                while (self.cursor < self.data.length() and self.data[self.cursor] != '\n') {
+                                        self.curr_string.appendChar(self.data[self.cursor]);
+                                        self.advance();
+                                }
+                                self.tokens.emplaceBack(start, TokenType::RawLine, self.curr_string);
+                                continue;
+                        }
+
+                        start = self.position;
                         // handle integers
                         if (self.foundDigit()) {
                                 self.curr_integer = "";
@@ -184,7 +241,7 @@ namespace Cash
         {
                 self.tokens.clear();
                 self.cursor = 0;
-                self.position = {0, 0};
+                self.position = {0, 0, 0};
                 self.has_error = false;
         }
 
@@ -198,6 +255,7 @@ namespace Cash
                 }
 
                 ++self.cursor;
+                self.position.offset = self.cursor;
         }
 
         void Lexer::setData(this Lexer &self, const String::String &new_data)

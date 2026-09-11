@@ -7,17 +7,46 @@ using namespace Melon;
 
 namespace Cash
 {
-        Parser::Parser(const tokens_t &tokens)
-                : tokens(tokens)
+        void Parser::flushCommandWord(this Parser &self, NodeCommand *node, String::String &curr, bool &first)
+        {
+                if (curr.length() == 0)
+                        return;
+
+                NodeName *arg = self.node_allocator.allocateNode<NodeName>();
+                arg->name = curr;
+                arg->index = nullptr;
+                arg->fallback = curr;
+
+                if (first) {
+                        node->path = arg;
+                        first = false;
+                } else {
+                        node->arguments.pushBack(arg);
+                }
+
+                curr = "";
+        }
+
+        Parser::Parser(const tokens_t &tokens, String::String source)
+                : tokens(tokens), source(source)
         {}
 
         void Parser::parse(this Parser &self)
         {
                 self.reset();
 
-                if (NodeDecl *decl = self.parseDecl())
+                if (NodeDecl *decl = self.parseDecl()) {
                         self.nodes.pushBack(decl);
-                else if (NodeExpr *expr = self.parseExpr())
+                        return;
+                }
+
+                if (self.expect(TokenType::RawLine)) {
+                        if (NodeCommand *cmd = self.parseCommand())
+                                self.nodes.pushBack(cmd);
+                        return;
+                }
+
+                if (NodeExpr *expr = self.parseExpr())
                         self.nodes.pushBack(expr);
         }
 
@@ -436,6 +465,49 @@ namespace Cash
                 return nullptr;
         }
 
+        NodeCommand *Parser::parseCommand(this Parser &self)
+        {
+                if (self.token_cursor >= self.tokens.length()) {
+                        syntaxError(self.precedentToken().value, self.precedentToken().position);
+                        self.node_allocator.freeAll();
+                        return nullptr;
+                }
+
+                Token tok = self.advance();
+                String::String line = tok.value;
+
+                NodeCommand *node = self.node_allocator.allocateNode<NodeCommand>();
+                String::String curr;
+                bool is_in_quotes = false;
+                bool is_first_word = true;
+
+                for (Typing::USize i = 0; i < line.length(); ++i) {
+                        char c = line[i];
+
+                        if (c == '"') {
+                                is_in_quotes = not is_in_quotes;
+                                continue;
+                        }
+
+                        if (Typing::isSpace(c) and not is_in_quotes) {
+                                self.flushCommandWord(node, curr, is_first_word);
+                                continue;
+                        }
+
+                        curr.appendChar(c);
+                }
+
+                self.flushCommandWord(node, curr, is_first_word);
+
+                if (is_first_word) {
+                        syntaxError(tok.value, tok.position);
+                        self.node_allocator.freeAll();
+                        return nullptr;
+                }
+
+                return node;
+        }
+
         void Parser::reset(this Parser &self)
         {
                 self.token_cursor = 0;
@@ -447,6 +519,11 @@ namespace Cash
         void Parser::setTokens(this Parser &self, const tokens_t &new_tokens)
         {
                 self.tokens = new_tokens;
+        }
+
+        void Parser::setSource(this Parser &self, const String::String &new_source)
+        {
+                self.source = new_source;
         }
 
         bool Parser::expect(this const Parser &self, TokenType token)

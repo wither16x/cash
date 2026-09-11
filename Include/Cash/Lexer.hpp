@@ -20,6 +20,8 @@ namespace Cash
                 bool lexing;
                 bool has_error;
 
+                bool looksLikeCommandStart(this const Lexer &self);
+
         public:
                 Lexer(const Melon::String::String &data = "");
 

@@ -68,7 +68,6 @@ namespace Cash
                                 return sym;
                 }
 
-                notDeclaredError(name);
                 return self.symbols[0];
         }
 

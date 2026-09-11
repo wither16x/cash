@@ -13,6 +13,7 @@ namespace Cash
                 Integer,
                 Name,
                 String,
+                RawLine,
 
                 Plus,
                 Minus,

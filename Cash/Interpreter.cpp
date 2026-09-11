@@ -6,10 +6,46 @@
 #include <Melon/Conversion.hpp>
 #include <variant>
 
+#include <unistd.h>
+
 using namespace Melon;
 
 namespace Cash
 {
+        EvalValue Interpreter::runCommand(const EvalValue &path, const Vector::Vector<EvalValue> &arguments)
+        {
+                String::String path_str = path.toString();
+                Vector::Vector<String::String> strings;
+
+                strings.pushBack(path_str);
+                for (const auto &arg : arguments)
+                        strings.pushBack(arg.toString());
+
+                char **argv = new char *[strings.length() + 1];
+
+                for (Typing::USize i = 0; i < strings.length(); ++i) {
+                        const char *raw = strings[i].raw();
+                        argv[i] = new char[strlen(raw) + 1];
+                        strcpy(argv[i], raw);
+                }
+                argv[strings.length()] = nullptr;
+
+                pid_t pid = fork();
+
+                if (pid == 0) {
+                        exec(path_str.raw(), static_cast<int>(strings.length()), argv, nullptr);
+                        return null_value;
+                } else {
+                        wait();
+                }
+
+                for (Typing::USize i = 0; i < strings.length(); ++i)
+                        delete[] argv[i];
+                delete[] argv;
+
+                return null_value;
+        }
+
         Interpreter::Interpreter(const ast_t &nodes)
                 : nodes(nodes)
         {}
@@ -161,8 +197,13 @@ namespace Cash
                 } else if (isNodeType<NodeName>(node)) {
                         NodeName *name_node = static_cast<NodeName *>(node);
                         const Symbol &symbol = self.symbol_table.getSymbol(name_node->name);
-                        if (not symbol.isDefined())
+                        
+                        if (not symbol.isDefined()) {
+                                if (name_node->fallback.length() != 0)
+                                        return EvalValue{name_node->fallback};
+                                notDeclaredError(name_node->name);
                                 return null_value;
+                        }
                         
                         if (name_node->index) {
                                 EvalValue index = self.evaluate(name_node->index);
@@ -225,6 +266,16 @@ namespace Cash
                         };
 
                         return value;
+                } else if (isNodeType<NodeCommand>(node)) {
+                        NodeCommand *commandd_node = static_cast<NodeCommand *>(node);
+
+                        EvalValue path = self.evaluate(commandd_node->path);
+
+                        Vector::Vector<EvalValue> arguments;
+                        for (auto &arg : commandd_node->arguments)
+                                arguments.pushBack(self.evaluate(arg));
+
+                        return self.runCommand(path, arguments);
                 }
 
                 return null_value;

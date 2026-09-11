@@ -14,6 +14,8 @@ namespace Cash
                 eval_values_t eval_values;
                 SymbolTable symbol_table;
 
+                EvalValue runCommand(const EvalValue &path, const Melon::Vector::Vector<EvalValue> &arguments);
+
         public:
                 Interpreter() = default;
                 Interpreter(const ast_t &nodes);

@@ -11,6 +11,8 @@ namespace Cash
                 const char *token_type_strings[] = {
                         "Integer",
                         "Name",
+                        "String",
+                        "Rawline",
                         "Plus",
                         "Minus",
                         "Star",
