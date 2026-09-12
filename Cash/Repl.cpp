@@ -21,6 +21,9 @@ namespace Cash
 
                 while (running) {
                         String::String command = Input::input("cash> ");
+                        if (command.length() == 0)
+                                continue;
+                        
                         lexer.setData(command);
                         if (not lexer.lex())
                                 continue;

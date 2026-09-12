@@ -35,6 +35,9 @@ namespace Cash
         {
                 self.reset();
 
+                if (self.tokens.length() == 0)
+                        return;
+
                 if (NodeDecl *decl = self.parseDecl()) {
                         self.nodes.pushBack(decl);
                         return;

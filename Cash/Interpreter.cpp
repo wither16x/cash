@@ -56,7 +56,7 @@ namespace Cash
 
                 for (auto &nd : self.nodes)
                         self.eval_values.pushBack(self.evaluate(nd));
-        }
+                }
 
         EvalValue Interpreter::evaluate(this Interpreter &self, Node *const &node)
         {
