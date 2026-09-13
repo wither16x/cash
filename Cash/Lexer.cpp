@@ -74,7 +74,7 @@ namespace Cash
                                 break;
 
                         Position start = self.position;
-                        if ((self.cursor == 0 or self.data[self.cursor] == '\n') and self.looksLikeCommandStart()) {
+                        if ((self.position.column == 0 or self.data[self.cursor] == '\n') and self.looksLikeCommandStart()) {
                                 self.curr_string = "";
                                 while (self.cursor < self.data.length() and self.data[self.cursor] != '\n') {
                                         self.curr_string.appendChar(self.data[self.cursor]);

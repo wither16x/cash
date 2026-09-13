@@ -2,6 +2,7 @@
 #include <Cash/Token.hpp>
 #include <Cash/Ast.hpp>
 #include <Cash/Error.hpp>
+#include <Melon/Typing.hpp>
 
 using namespace Melon;
 
@@ -38,19 +39,26 @@ namespace Cash
                 if (self.tokens.length() == 0)
                         return;
 
-                if (NodeDecl *decl = self.parseDecl()) {
-                        self.nodes.pushBack(decl);
-                        return;
-                }
+                while (self.token_cursor < self.tokens.length()) {
+                        if (NodeDecl *decl = self.parseDecl()) {
+                                self.nodes.pushBack(decl);
+                                continue;
+                        }
 
-                if (self.expect(TokenType::RawLine)) {
-                        if (NodeCommand *cmd = self.parseCommand())
-                                self.nodes.pushBack(cmd);
-                        return;
-                }
+                        if (self.expect(TokenType::RawLine)) {
+                                if (NodeCommand *cmd = self.parseCommand()) {
+                                        self.nodes.pushBack(cmd);
+                                        continue;
+                                }
+                        }
 
-                if (NodeExpr *expr = self.parseExpr())
-                        self.nodes.pushBack(expr);
+                        if (NodeExpr *expr = self.parseExpr()) {
+                                self.nodes.pushBack(expr);
+                                continue;
+                        }
+
+                        break;
+                }
         }
 
         NodeDecl *Parser::parseDecl(this Parser &self)
