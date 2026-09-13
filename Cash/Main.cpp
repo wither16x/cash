@@ -30,15 +30,13 @@ int main(int argc, char **argv)
                                 "\t--help, -h: display this message\n"
                                 "\t--file, -f: <pathname>: path to the file"
                         );
-                } else if (strcmp(argv[i], "--file") == 0 or strcmp(argv[i], "-f") == 0) {
-                        ++i;
-                        
-                        if (not argv[i]) {
+                } else if (strcmp(argv[i], "--file") == 0 or strcmp(argv[i], "-f") == 0) {                        
+                        if (not argv[i + 1]) {
                                 Print::println("Usage: {} <pathname>", argv[i]);
                                 break;
                         }
                         
-                        FileSystem::File f(argv[i], "r");
+                        FileSystem::File f(argv[i + 1], "r");
                         auto buf = f.read();
                         buf[buf.size() - 1] = '\0';
                         String::String data = buf.get();
@@ -67,6 +65,7 @@ int main(int argc, char **argv)
                                         Print::println("{}", val.toString());
                         }
 
+                        ++i;
                         continue;
                 } else {
                         Print::println("Invalid argument: \"{}\". Try using --help.", argv[i]);
